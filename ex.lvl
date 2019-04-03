@@ -1,9 +1,9 @@
 @***********************************ex.lvl*******************************************
 
 operators:
- $,   &,  |,   *,    %,   /, \,   ++, --,   ^,     ~,      ==,       #,       !,   ?
+ $,   &,  -,   *,    %,   /, \,   ++, --,   ^,     ~,      ==,       #,       !,   ?,  |,  +
 
-div, and, or, mult, mod, gt, lt, add, sub, expo, pointer, equal, logical eq, xor, not
+div, and, or, mult, mod, gt, lt, add, sub, expo, pointer, equal, logical eq, xor, not, inc, dec
 
 braces:
 
