@@ -1,7 +1,7 @@
 @***********************************ex.lvl*******************************************
 
 operators:
- $,   &,  -,   *,    %,   /, \,   ++, --,   ^,     ~,      ==,       #,       !,   ?,  |,  +
+ $,   &,  =,   *,    %,   /, \,   ++, --,   ^,     ~,      ==,       #,       !,   ?,  |,  +
 
 div, and, or, mult, mod, gt, lt, add, sub, expo, pointer, equal, logical eq, xor, not, inc, dec
 
@@ -27,12 +27,18 @@ keywords:
 	void
 
 characters:
-	0-9, a-z,A-Z,`,-,
+	0-9, a-z,A-Z,`,-,_
 
 block comment:
     @* and *@
 single line comment:
     ?>
+
+types:
+    signed int: num
+    signed float: dec
+    character: letter
+    unsigned: un
 
 General program structure:
 

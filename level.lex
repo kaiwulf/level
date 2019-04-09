@@ -4,10 +4,11 @@
 
 DIGIT   [0-9]
 ID      [*`][a-z][a-z0-9]
-OPS     "+"|"-"|"*"|"/"|"="|"~"|"&"|"%"|"|"|"~"|"++"|"--"|"\\"|"^"|"~"|"!"|"?"|"|"|"$"|"-"|"#"
+OPS     "+"|"="|"*"|"/"|"=="|"~"|"&"|"%"|"|"|"~"|"++"|"--"|"\\"|"^"|"~"|"!"|"?"|"|"|"$"|"-"|"#"
 LBRACE  "("|"["|"{"|"::"|"<"
 RBRACE  ")"|"]"|"}"|":;"|">"
-KEY     let|num|dec|letter|loop|how|go|loop|what|then|segment|start|end|begin|stop|void
+KEY     let|num|dec|letter|loop|how|go|loop|what|then|segment|start|end|begin|stop|void|letter|un
+
 LCOM    "@*"
 RCOM    "*@"
 SCOM    "?>"
@@ -17,7 +18,7 @@ SCOM    "?>"
 
 {RCOM}  printf("right comment block: %s\n", yytext);
 
-{SCOM}  printf("single comment block: %s\n", yytext);
+{SCOM}  printf("single comment line: %s\n", yytext);
 
 {DIGIT}+ {
     printf("An integer: %s (%d)\n", yytext, atoi(yytext));
