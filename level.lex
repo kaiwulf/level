@@ -44,6 +44,7 @@ SCOM    "?>"
     printf( "An operator: %s\n", yytext );
     }
 
+;   printf("Delemeter: %s\n", yytext);
 
 [ \t\n]     /* white space */
 .   printf("Unrecognized character %s\n", yytext);
