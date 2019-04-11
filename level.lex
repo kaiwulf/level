@@ -1,10 +1,11 @@
 %{
     #include <math.h>
+    int lineno;
 %}
 
 DIGIT   [0-9]
-ID      [*`][a-z][a-z0-9]
-OPS     "+"|"="|"*"|"/"|"=="|"~"|"&"|"%"|"|"|"~"|"++"|"--"|"\\"|"^"|"~"|"!"|"?"|"|"|"$"|"-"|"#"
+ID      [`_a-zA-Z]
+OPS     "+"|"="|"*"|"/"|"=="|"~"|"&"|"%"|"|"|"~"|"++"|"--"|"\\"|"^"|"~"|"!"|"?"|"|"|"$"|"-"|"#"|":"
 LBRACE  "("|"["|"{"|"::"|"<"
 RBRACE  ")"|"]"|"}"|":;"|">"
 KEY     let|num|dec|letter|loop|how|go|loop|what|then|segment|start|end|begin|stop|void|letter|un
@@ -12,7 +13,6 @@ KEY     let|num|dec|letter|loop|how|go|loop|what|then|segment|start|end|begin|st
 LCOM    "@*"
 RCOM    "*@"
 SCOM    "?>"
-
 %%
 {LCOM}  printf("left comment block: %s\n", yytext);
 
@@ -28,17 +28,17 @@ SCOM    "?>"
     printf("A float: %s (%g)\n", yytext, atof(yytext));
     }
 
-{ID} {
+{KEY} {
+    printf("keyword %s\n", yytext);
+    }
+
+{ID}({ID}|{DIGIT})* {
     printf("An i.d.: %s\n", yytext);
     }
 
 {LBRACE} printf("left brace: %s\n", yytext);
 
 {RBRACE} printf("right brace: %s\n", yytext);
-
-{KEY} {
-    printf("keyword %s\n", yytext);
-    }
 
 {OPS} {
     printf( "An operator: %s\n", yytext );
@@ -48,6 +48,7 @@ SCOM    "?>"
 
 [ \t\n]     /* white space */
 .   printf("Unrecognized character %s\n", yytext);
+
 %%
 
 int main(int argc, char *argv[]) {
