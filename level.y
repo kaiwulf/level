@@ -28,6 +28,10 @@ expr:
     | '(' expr ')'  { $$ = $2; }
     ;
 
+stmt:
+    IF expr stmt
+    | IF expr stmt ELSE stmt
+    ;
 %%
 void yyerror(char *s) {
     fprintf(stderr, "%s\n", s);

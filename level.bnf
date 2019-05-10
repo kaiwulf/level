@@ -1,0 +1,38 @@
+<program> ::= <statement>+ stop ';'
+<statement> ::= <labeledStatement>
+            |   <compoundStatement>
+            |   <expressionStatement>
+            |   <selectionStatement>
+            |   <iterationStatement>
+
+<compoundStatement> ::= '{' <blockItemList>? '}'
+
+<blockItemList> ::= <blockItem> | <blockItemList><blockItem>
+
+<blockItem> ::= <statement> | <declaration>
+
+<expressionStatement> ::= <expression>? ';'
+
+<selectionStatement> ::= "what" '[' <expression> ']' <statement> ("then" <statement>)?
+
+<iterationStatement> ::= "loop" '[' <expression> ']' <statement> "end" "loop" ';'
+                     |   "go" <statement> "loop" '[' <expression> ']' "end" "go" ';'
+                     |   "how" '[' <howCondition> ']' <statement> "end" "how" ';'
+
+<howCondition> ::= <expression>? ';' <howDeclaration> ';' <expression>?
+
+<howExpression> ::= <assignmentExpression>
+                |   <howExpression> ';' <assignmentExpression>
+
+<expression> ::= <assignmentExpression>
+             |   <expression> ',' <assignmentExpression>
+
+<assignmentOperator> ::= '$' | '&' | '=' | '*' | '%' | '/' | '\' | '++' | '--' | '^' | '~' | '==' | '#'
+                     | '!' | '?' | '|' | '+'
+
+<assignmentExpression> ::= <braceExpression>
+                        | <unaryExpression> <assignmentOperator> <assignmentExpression>
+                        | <DigitSequence>
+
+<DigitSequence> ::= Digit+
+<Digit> ::= [0-9]

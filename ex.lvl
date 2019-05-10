@@ -9,6 +9,9 @@ braces:
 
 (, ), [, ], {, }, ::, :;, <, >
 
+braces for compound statements:
+    (, )
+
 keywords:
 
 	let (declaration)
