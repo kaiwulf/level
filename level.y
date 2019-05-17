@@ -1,44 +1,64 @@
-%token INTEGER VARIABLE
+%{
+    #include <stdio.h>
+    int yylex();
+    void yyerror(const char *s);
+    double vbltable[26];
+%}
+
+%union {
+    double dval;
+    int vblno;
+}
+
+%token <vblno> VARIABLE
+%token <dval> NUMBER
 %left '+' '-'
 %left '*' '/'
-%{
-    void yyerror(char *);
-    int yylex(void);
-    int sym[26];
-%}
+%nonassoc UMINUS
+
+%type <dval> expr
 %%
-program:
+/*program:
     program statement '\n'
     |
-    ;
+    ;*/
 
-statement:
-    expr                    { printf("%d\n", $1); }
-    | VARIABLE '=' expr     { sym[$1] = $3; }
+statement_list: statement '\n'
+    | statement_list statement '\n'
+
+statement: VARIABLE '=' expr    { vbltable[$1] = $3; }
+    | expr     { printf("%d", $1); }
     ;
 
 
 expr:
-    INTEGER
-    | VARIABLE      { $$ = sym[$1]; }
-    | expr '+' expr { $$ = $1 + $3; }
+    expr '+' expr { $$ = $1 + $3; }
     | expr '-' expr { $$ = $1 - $3; }
     | expr '*' expr { $$ = $1 * $3; }
-    | expr '/' expr { $$ = $1 / $3; }
-    | '(' expr ')'  { $$ = $2; }
+    | expr '/' expr
+        {
+            if($3 == 0.0)
+                yyerror("divide by zero\n");
+            else
+                $$ = $1 / $3;
+         }
+    | '(' expr ')'      { $$ = $1; }
+    | '-' expr %prec UMINUS  { $$ = -$2; }
+    | NUMBER            { $$ = $1; }
+    | VARIABLE          { $$ = vbltable[$1]; }
     ;
 
-stmt:
+/*stmt:
     IF expr stmt
     | IF expr stmt ELSE stmt
-    ;
+    ;*/
 %%
-void yyerror(char *s) {
+/*void yyerror(char *s) {
     fprintf(stderr, "%s\n", s);
     return 0;
-}
-
+}*/
+/*
 int main(void) {
     yyparse();
     return 0;
-}
+}*/
