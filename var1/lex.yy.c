@@ -1,5 +1,5 @@
 
-#line 3 "lex.yy.c"
+#line 2 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -362,7 +362,7 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[18] =
     {   0,
-        0,    0,    8,    6,    2,    5,    6,    1,    4,    3,
+        0,    0,    8,    6,    2,    5,    4,    6,    1,    3,
         1,    0,    1,    0,    0,    1,    0
     } ;
 
@@ -371,10 +371,10 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    4,    1,    4,    5,    1,    6,    6,    6,
-        6,    6,    6,    6,    6,    6,    6,    1,    1,    1,
-        1,    1,    7,    1,    1,    1,    1,    1,    8,    1,
+        1,    2,    1,    1,    1,    4,    1,    1,    1,    1,
+        1,    1,    5,    1,    5,    6,    1,    7,    7,    7,
+        7,    7,    7,    7,    7,    7,    7,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    8,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    9,    9,    9,    9,
@@ -400,24 +400,24 @@ static const YY_CHAR yy_ec[256] =
 
 static const YY_CHAR yy_meta[11] =
     {   0,
-        1,    1,    1,    1,    1,    2,    1,    2,    1,    2
+        1,    1,    1,    1,    1,    1,    2,    2,    1,    2
     } ;
 
 static const flex_int16_t yy_base[19] =
     {   0,
-        0,    0,   21,   22,   22,   22,   14,    6,   22,   22,
-       13,   12,    0,    9,   11,   10,   22,   12
+        0,    0,   21,   22,   22,   22,   22,   13,    5,   22,
+       12,   11,    0,    8,   10,    9,   22,   12
     } ;
 
 static const flex_int16_t yy_def[19] =
     {   0,
        17,    1,   17,   17,   17,   17,   17,   17,   17,   17,
-       18,   17,    8,   17,   17,   17,    0,   17
+       18,   17,    9,   17,   17,   17,    0,   17
     } ;
 
 static const flex_int16_t yy_nxt[33] =
     {   0,
-        4,    5,    6,    4,    7,    8,    9,    4,   10,   10,
+        4,    5,    6,    7,    4,    8,    9,    4,   10,   10,
        12,   13,   15,   14,   16,   16,   16,   11,   11,   11,
        17,    3,   17,   17,   17,   17,   17,   17,   17,   17,
        17,   17
@@ -426,7 +426,7 @@ static const flex_int16_t yy_nxt[33] =
 static const flex_int16_t yy_chk[33] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        8,    8,   14,   18,   14,   16,   15,   12,   11,    7,
+        9,    9,   14,   18,   14,   16,   15,   12,   11,    8,
         3,   17,   17,   17,   17,   17,   17,   17,   17,   17,
        17,   17
     } ;
@@ -447,8 +447,9 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "lexer.lex"
 #line 2 "lexer.lex"
-    #include "level.tab.h"
-    extern int yylval;
+#include "level.tab.h"
+#include <math.h>
+extern double vbltable[26];
 #line 453 "lex.yy.c"
 #line 454 "lex.yy.c"
 
@@ -667,7 +668,7 @@ YY_DECL
 		}
 
 	{
-#line 6 "lexer.lex"
+#line 7 "lexer.lex"
 
 #line 673 "lex.yy.c"
 
@@ -728,39 +729,41 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 7 "lexer.lex"
-{ yylval.dval = atoi(yytext); return NUMBER; }
+#line 8 "lexer.lex"
+{
+	yylval.dval = atof(yytext); return NUMBER;
+	}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 8 "lexer.lex"
-;
+#line 12 "lexer.lex"
+;		 /* ignore white space */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 9 "lexer.lex"
-{ yyval.vblno = yytext[0] - 'a'; return VARIABLE; }
+#line 14 "lexer.lex"
+{ yylval.vblno = yytext[0] - 'a'; return NAME; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 10 "lexer.lex"
-{ return 0; }
+#line 16 "lexer.lex"
+{ return 0; /* end of input */ }
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
-#line 12 "lexer.lex"
+#line 19 "lexer.lex"
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 12 "lexer.lex"
+#line 19 "lexer.lex"
 return yytext[0];
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 13 "lexer.lex"
+#line 20 "lexer.lex"
 ECHO;
 	YY_BREAK
-#line 764 "lex.yy.c"
+#line 766 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1765,6 +1768,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 13 "lexer.lex"
+#line 20 "lexer.lex"
 
 

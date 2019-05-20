@@ -1,16 +1,21 @@
 %{
     #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include "sym.h"
+
     int yylex();
     void yyerror(const char *s);
+    struct symtab *symlook(char *s);
     double vbltable[26];
 %}
 
 %union {
     double dval;
-    int vblno;
+    struct symtab *symp;
 }
 
-%token <vblno> VARIABLE
+%token <symp> VARIABLE
 %token <dval> NUMBER
 %left '+' '-'
 %left '*' '/'
@@ -26,8 +31,8 @@
 statement_list: statement '\n'
     | statement_list statement '\n'
 
-statement: VARIABLE '=' expr    { vbltable[$1] = $3; }
-    | expr     { printf("%d", $1); }
+statement: VARIABLE '=' expr    { $1->value = $3; }
+    | expr     { printf("%d\n", $1); }
     ;
 
 
@@ -42,10 +47,10 @@ expr:
             else
                 $$ = $1 / $3;
          }
-    | '(' expr ')'      { $$ = $1; }
+    | '(' expr ')'      { $$ = $2; }
     | '-' expr %prec UMINUS  { $$ = -$2; }
     | NUMBER            { $$ = $1; }
-    | VARIABLE          { $$ = vbltable[$1]; }
+    | VARIABLE          { $$ = $1->value; }
     ;
 
 /*stmt:
@@ -53,10 +58,26 @@ expr:
     | IF expr stmt ELSE stmt
     ;*/
 %%
-/*void yyerror(char *s) {
+
+struct symtab *symlook(char *s) {
+    char *p;
+    struct symtab *sp;
+
+    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+        if(sp->name && !strcmp(sp->name, s))
+            return sp;
+        if(!sp->name) {
+            sp->name = strdup(s);
+            return sp;
+        }
+    }
+    yyerror("Too many symbols");
+    exit(1);
+}
+
+void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);
-    return 0;
-}*/
+}
 /*
 int main(void) {
     yyparse();
