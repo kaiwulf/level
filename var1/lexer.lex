@@ -1,20 +1,12 @@
 %{
-#include "level.tab.h"
-#include <math.h>
-extern double vbltable[26];
+    #include <stdlib.h>
+    #include "level.tab.h"
+    extern int yylval;
 %}
 
 %%
-([0-9]+|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?) {
-	yylval.dval = atof(yytext); return NUMBER;
-	}
-
-[ \t]	;		 /* ignore white space */
-
-[a-z]	{ yylval.vblno = yytext[0] - 'a'; return NAME; }
-
-"$"	{ return 0; /* end of input */ }
-
-\n	|
+[0-9]+	{ yylval = atoi(yytext); return NUMBER; }
+[ \t]	;		/* ignore white space */
+\n	return 0;	/* logical EOF */
 .	return yytext[0];
 %%

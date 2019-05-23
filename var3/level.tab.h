@@ -56,10 +56,10 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 9 "level.y" /* yacc.c:1909  */
+#line 13 "level.y" /* yacc.c:1909  */
 
-	double dval;
-	int vblno;
+    double dval;
+    struct symtab *symp;
 
 #line 65 "level.tab.h" /* yacc.c:1909  */
 };

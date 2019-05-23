@@ -1,44 +1,32 @@
 %{
-    /* gcc lex.yy.c level.tab.c -o adder -lm -lfl -ly */
     #include <stdio.h>
-    double vbltable[26];
+    #include <stdlib.h>
+    #define YYDEBUG 1
+    void yyerror(char const *);
     int yylex();
-    void yyerror(char *);
 %}
 
-%union {
-	double dval;
-	int vblno;
+%define api.value.type {int}
+%token NUMBER
+%%
+
+input:
+      %empty
+    | input statement
+    ;
+
+ statement:	/*VARIABLE '=' expr {  $1 = $3; } */
+    '\n'
+	|	expr '\n'                  { printf ("%.10g\n", $1); }
+	;
+
+expr:
+      NUMBER                { $$ = $1; }
+	|   expr '+' NUMBER     { $$ = $1 + $3; }
+	|	expr '-' NUMBER     { $$ = $1 - $3; }
+	;
+%%
+
+void yyerror(char const *s) {
+    fprintf (stderr, "%s\n", s);
 }
-
-%token <vblno> NAME
-%token <dval> NUMBER
-%left '-' '+'
-%left '*' '/'
-%nonassoc UMINUS
-
-%type <dval> expression
-%%
-statement_list:	statement '\n'
-	|	statement_list statement '\n'
-	;
-
-statement:	NAME '=' expression	{ vbltable[$1] = $3; }
-	|	expression		{ printf("= %d\n", $1); }
-	;
-
-expression:	expression '+' expression { $$ = $1 + $3; }
-	|	expression '-' expression { $$ = $1 - $3; }
-	|	expression '*' expression { $$ = $1 * $3; }
-	|	expression '/' expression
-				{	if($3 == 0.0)
-						yyerror("divide by zero");
-					else
-						$$ = $1 / $3;
-				}
-	|	'-' expression %prec UMINUS	{ $$ = -$2; }
-	|	'(' expression ')'	{ $$ = $2; }
-	|	NUMBER
-	|	NAME			{ $$ = vbltable[$1]; }
-	;
-%%

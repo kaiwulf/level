@@ -1,85 +1,44 @@
 %{
+    /* gcc lex.yy.c level.tab.c -o adder -lm -lfl -ly */
     #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include "sym.h"
-
-    int yylex();
-    void yyerror(const char *s);
-    struct symtab *symlook(char *s);
     double vbltable[26];
+    int yylex();
+    void yyerror(char *);
 %}
 
 %union {
-    double dval;
-    struct symtab *symp;
+	double dval;
+	int vblno;
 }
 
-%token <symp> VARIABLE
+%token <vblno> VARIABLE
 %token <dval> NUMBER
-%left '+' '-'
+%left '-' '+'
 %left '*' '/'
 %nonassoc UMINUS
 
-%type <dval> expr
+%type <dval> expression
 %%
-/*program:
-    program statement '\n'
-    |
-    ;*/
+statement_list:	statement '\n'
+	|	statement_list statement '\n'
+	;
 
-statement_list: statement '\n'
-    | statement_list statement '\n'
+statement:	VARIABLE '=' expression	{ vbltable[$1] = $3; }
+	|	expression		{ printf("= %lf\n", $1); }
+	;
 
-statement: VARIABLE '=' expr    { $1->value = $3; }
-    | expr     { printf("%d\n", $1); }
-    ;
-
-
-expr:
-    expr '+' expr { $$ = $1 + $3; }
-    | expr '-' expr { $$ = $1 - $3; }
-    | expr '*' expr { $$ = $1 * $3; }
-    | expr '/' expr
-        {
-            if($3 == 0.0)
-                yyerror("divide by zero\n");
-            else
-                $$ = $1 / $3;
-         }
-    | '(' expr ')'      { $$ = $2; }
-    | '-' expr %prec UMINUS  { $$ = -$2; }
-    | NUMBER            { $$ = $1; }
-    | VARIABLE          { $$ = $1->value; }
-    ;
-
-/*stmt:
-    IF expr stmt
-    | IF expr stmt ELSE stmt
-    ;*/
+expression:	expression '+' expression { $$ = $1 + $3; }
+	|	expression '-' expression { $$ = $1 - $3; }
+	|	expression '*' expression { $$ = $1 * $3; }
+	|	expression '/' expression
+				{	if($3 == 0.0)
+						yyerror("divide by zero");
+					else
+						$$ = $1 / $3;
+				}
+	|	'-' expression %prec UMINUS	{ $$ = -$2; }
+	|	'(' expression ')'	{ $$ = $2; }
+	|	NUMBER
+	|	VARIABLE			{ $$ = vbltable[$1]; }
+	;
 %%
-
-struct symtab *symlook(char *s) {
-    char *p;
-    struct symtab *sp;
-
-    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
-        if(sp->name && !strcmp(sp->name, s))
-            return sp;
-        if(!sp->name) {
-            sp->name = strdup(s);
-            return sp;
-        }
-    }
-    yyerror("Too many symbols");
-    exit(1);
-}
-
-void yyerror(const char *s) {
-    fprintf(stderr, "%s\n", s);
-}
-/*
-int main(void) {
-    yyparse();
-    return 0;
-}*/

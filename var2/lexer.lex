@@ -1,17 +1,20 @@
 %{
-    #include "level.tab.h"
-    /* extern int yylval; */
+	#include "level.tab.h"
+	#include <math.h>
+	extern double vbltable[26];
 %}
 
 %%
-([0-9]+|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?)  { yylval.dval = atof(yytext); return NUMBER; }
-[ \t]   ;
-[A-Za-z][A-Za-z0-9]*    {
-        yylval.dval = atof(yytext);
-        return NUMBER;
-}
+([0-9]+|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?) {
+	yylval.dval = atof(yytext); return NUMBER;
+	}
 
-"$"     { return 0; }
-\n      |
-.       return yytext[0];
+[ \t]	;		 /* ignore white space */
+
+[a-z]	{ yylval.vblno = yytext[0] - 'a'; return VARIABLE; }
+
+"$"	{ return 0; /* end of input */ }
+
+\n	|
+.	return yytext[0];
 %%
