@@ -448,9 +448,10 @@ char *yytext;
 #line 1 "lexer.lex"
 #line 2 "lexer.lex"
     #include "level.tab.h"
+    #include "sym.h"
     /* extern int yylval; */
-#line 452 "lex.yy.c"
 #line 453 "lex.yy.c"
+#line 454 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -667,9 +668,9 @@ YY_DECL
 		}
 
 	{
-#line 6 "lexer.lex"
+#line 7 "lexer.lex"
 
-#line 672 "lex.yy.c"
+#line 673 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -728,42 +729,42 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 7 "lexer.lex"
+#line 8 "lexer.lex"
 { yylval.dval = atof(yytext); return NUMBER; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 8 "lexer.lex"
+#line 9 "lexer.lex"
 ;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 9 "lexer.lex"
+#line 10 "lexer.lex"
 {
-        yylval.dval = atof(yytext);
-        return NUMBER;
+        yylval.symp = symlook(yytext);
+        return VARIABLE;
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 14 "lexer.lex"
+#line 15 "lexer.lex"
 { return 0; }
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
-#line 16 "lexer.lex"
+#line 17 "lexer.lex"
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 16 "lexer.lex"
+#line 17 "lexer.lex"
 return yytext[0];
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 17 "lexer.lex"
+#line 18 "lexer.lex"
 ECHO;
 	YY_BREAK
-#line 766 "lex.yy.c"
+#line 767 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1768,6 +1769,17 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 17 "lexer.lex"
+#line 18 "lexer.lex"
 
+
+int yywrap(void)
+{
+     return 0;
+}
+
+int main(void)
+{
+    yyparse();
+    return 0;
+}
 

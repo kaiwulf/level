@@ -45,7 +45,8 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NUMBER = 258
+    VARIABLE = 258,
+    NUMBER = 259
   };
 #endif
 

@@ -7,23 +7,18 @@
 %}
 
 %define api.value.type {int}
-%token NUMBER
+%token VARIABLE NUMBER
 %%
 
-input:
-      %empty
-    | input statement
-    ;
 
- statement:	/*VARIABLE '=' expr {  $1 = $3; } */
-    '\n'
-	|	expr '\n'                  { printf ("%.10g\n", $1); }
+ statement:	VARIABLE '=' expr
+	|	expr                   { printf ("%d\n", $1); }
 	;
 
 expr:
-      NUMBER                { $$ = $1; }
 	|   expr '+' NUMBER     { $$ = $1 + $3; }
 	|	expr '-' NUMBER     { $$ = $1 - $3; }
+    |   NUMBER              { $$ = $1; }
 	;
 %%
 

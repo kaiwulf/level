@@ -10,3 +10,14 @@
 \n	return 0;	/* logical EOF */
 .	return yytext[0];
 %%
+
+/* int yywrap(void)
+{
+     return 0;
+} */
+
+int main(void)
+{
+    yyparse();
+    return 0;
+}

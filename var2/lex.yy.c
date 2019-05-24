@@ -1771,3 +1771,9 @@ void yyfree (void * ptr )
 #line 20 "lexer.lex"
 
 
+int main(void)
+{
+    yyparse();
+    return 0;
+}
+

@@ -18,3 +18,9 @@
 \n	|
 .	return yytext[0];
 %%
+
+int main(void)
+{
+    yyparse();
+    return 0;
+}
