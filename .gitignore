@@ -1,3 +1,4 @@
 dsl/
 tutorials/
 calc/
+*.o

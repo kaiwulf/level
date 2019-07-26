@@ -22,9 +22,3 @@ int yywrap(void)
 {
      return 0;
 }
-
-/*int main(void)
-{
-    yyparse();
-    return 0;
-}*/

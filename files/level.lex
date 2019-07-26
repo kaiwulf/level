@@ -8,7 +8,7 @@ ID      [`_a-zA-Z]
 OPS     "+"|"="|"*"|"/"|"=="|"~"|"&"|"%"|"|"|"~"|"++"|"--"|"\\"|"^"|"~"|"!"|"?"|"|"|"$"|"-"|"#"|":"
 LBRACE  "("|"["|"{"|"::"|"<"
 RBRACE  ")"|"]"|"}"|":;"|">"
-KEY     let|num|dec|letter|loop|how|go|loop|what|then|segment|start|end|begin|stop|void|letter|un
+KEY     let|num|dec|letter|how|go|loop|what|then|segment|start|end|begin|stop|void|un
 
 LCOM    "@*"
 RCOM    "*@"
