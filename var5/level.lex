@@ -20,7 +20,7 @@ DIGIT+  { return NUMBER; }
 "++"    { return ADDOP; }
 "--"    { return SUBOP; }
 "^"     { return EXPOP; }
-"^"     { return POINTER; }
+"~"     { return POINTER; }
 "#"     { return LOGEQOP; }
 "!"     { return XOROP; }
 "?"     { return NOTOP; }
