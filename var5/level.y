@@ -28,7 +28,7 @@
     struct sym_rec *sym;
 }
 
-%token <sym> IDENT
+%token <char> IDENT
 %token <dval> NUM
 %token <char> LETTER
 %token LET WHAT THEN
@@ -48,6 +48,9 @@ statement: VARIABLE '=' expr    { $1->value = $3; }
     | expr     { printf("%.10g\n", $1); }
     ;
 
+statement: /* empty */
+    | LETTER IDENT ';' { install($1) }
+    | NUM IDENT ';'    { install($1) }
 
 expr:
     expr '+' expr { $$ = $1 + $3; }

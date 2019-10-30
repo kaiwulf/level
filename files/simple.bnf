@@ -1,0 +1,76 @@
+program ::= LET [ declarations ] IN command sequence END
+declarations ::= INTEGER [ id seq ] IDENTIFIER .
+id seq ::= id seq... IDENTIFIER ,
+command sequence ::= command... command
+command ::= SKIP ;
+| IDENTIFIER := expression ;
+| IF exp THEN command sequence ELSE command sequence FI ;
+| WHILE exp DO command sequence END ;
+| READ IDENTIFIER ;
+| WRITE expression ;
+expression ::= NUMBER | IDENTIFIER | ’(’ expression ’)’
+| expression + expression | expression − expression
+| expression ∗ expression | expression / expression
+| expression ˆ expression
+| expression = expression
+| expression < expression
+| expression > expression
+
+%start program
+%token LET INTEGER IN
+%token SKIP IF THEN ELSE END WHILE DO READ WRITE
+5%token NUMBER
+%token IDENTIFIER
+%left ’-’ ’+’
+%left ’*’ ’/’
+%right ’ˆ ’
+%%
+Grammar rules and actions
+%%
+C subroutines
+C and parser declarations
+%%
+program : LET declarations IN commands END ;
+declarations : /* empty */
+| INTEGER id seq IDENTIFIER ’.’
+;
+id seq : /* empty */
+| id seq IDENTIFIER ’,’
+;
+commands : /* empty */
+| commands command ’;’
+;
+command : SKIP
+| READ IDENTIFIER
+| WRITE exp
+| IDENTIFIER ASSGNOP exp
+| IF exp THEN commands ELSE commands FI
+| WHILE exp DO commands END
+;
+exp : NUMBER
+| IDENTIFIER
+| exp ’<’ exp
+| exp ’=’ exp
+| exp ’>’ exp
+| exp ’+’ exp
+| exp ’−’ exp
+| exp ’∗’ exp
+| exp ’/’ exp
+| exp ’ˆ ’ exp
+| ’(’ exp ’)’
+;
+%%
+C subroutines
+
+declarations : /* empty */
+| INTEGER id seq IDENTIFIER ’.’ { install( $3 ); }
+;
+id seq : /* empty */
+| id seq IDENTIFIER ’,’ { install( $2 ); }
+;
+command : SKIP
+| READ IDENTIFIER { context check( $2 ); }
+| IDENT ASSGNOP exp { context check( $2 ); }
+...
+exp : INT
+| IDENT { context check( $2 ); }
