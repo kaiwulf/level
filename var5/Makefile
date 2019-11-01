@@ -1,20 +1,20 @@
-$LEX = flex -I
-$BISON = bison -d
-LFLAGS = -lfl
+LEX = flex -I
+BISON = bison -d
+LFLAGS = -lfl -lm
 BFLAGS = -ly
-OFLAGS = -lm -fPIC -shared
+OFLAGS = -fPIC -shared
 
 adder: level.tab.o lex.yy.o
-	$(CC) -o adder level.tab.o lex.yy.o -ly -lfl -lm
+	$(CC) -o adder level.tab.o lex.yy.o $(LFLAGS) 
 
-lex.yy.o:	lex.yy.c "level.tab.h"
+lex.yy.o:	lex.yy.c level.tab.h
 
 lex.yy.o level.tab.o: sym.h
 
-level.tab.c "lexer.tab.h": level.y
+level.tab.c lexer.tab.h: level.y
 	$(BISON) level.y
 
-lex.yy.c "level.tab.h": lexer.lex
+lex.yy.c level.tab.h: lexer.lex
 	$(LEX) lexer.lex
 
 clear:
