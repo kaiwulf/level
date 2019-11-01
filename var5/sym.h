@@ -2,12 +2,22 @@
  *	Symbol table for level interpreter
  */
 
-struct sym_rec {
-    char *name;
-    struct sym_rec sym_rec *next;
-};
+#define NSYMS 20	/* maximum number of symbols */
 
 typedef struct sym_rec sym_rec;
+
+struct sym_rec {
+    char *name;
+    struct sym_rec *next;
+};
+
+struct symtab {
+	char *name;
+    double (*funcptr)();
+	double value;
+} symtab[NSYMS];
+
+
 sym_rec *sym_table = NULL;
 sym_rec *put_sym();
 sym_rec *get_sym();

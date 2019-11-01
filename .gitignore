@@ -2,3 +2,5 @@ dsl/
 tutorials/
 calc/
 *.o
+*.tab.*
+*.yy.*

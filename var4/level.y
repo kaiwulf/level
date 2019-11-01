@@ -26,6 +26,7 @@
 
 statement_list: statement '\n'
     | statement_list statement '\n'
+    ;
 
 statement: VARIABLE '=' expr    { $1->value = $3; }
     | expr     { printf("%.10g\n", $1); }
@@ -56,11 +57,6 @@ expr:
     | NUMBER                { $$ = $1; }
     | VARIABLE              { $$ = $1->value; }
     ;
-
-/*stmt:
-    IF expr stmt
-    | IF expr stmt ELSE stmt
-    ;*/
 %%
 
 struct symtab *symlook(char *s) {

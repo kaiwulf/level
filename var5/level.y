@@ -25,45 +25,53 @@
 %union {
     int dval;
     char letter;
-    struct sym_rec *sym;
+    struct sym_rec *sym_rec;
 }
 
+%token <sym_rec> VARIABLE
+%token <symtab> FUNC
 %token <char> IDENT
-%token <dval> NUM
+%token <dval> NUMBER
 %token <char> LETTER
 %token LET WHAT THEN
 %left '&' '='
-%left '++' '-'
+%left "++" "--"
 %left '*' '$' '%'
-%right '^'
+// %right '^'
 %nonassoc UMINUS
 
 %type <dval> expr
+
 %%
 
 statement_list: statement '\n'
     | statement_list statement '\n'
-
-statement: VARIABLE '=' expr    { $1->value = $3; }
-    | expr     { printf("%.10g\n", $1); }
     ;
 
-statement: /* empty */
-    | LETTER IDENT ';' { install($1) }
-    | NUM IDENT ';'    { install($1) }
+statement: VARIABLE "==" expr    { $1->name = $3; }
+    | expr     { printf("%.10g\n", $1); }
+    | assignment
+    ;
 
+assignment: /* empty */
+    | LETTER IDENT ';' { install($1); }
+    | NUMBER IDENT ';'    { install($1); }
+    ;
+    
 expr:
-    expr '+' expr { $$ = $1 + $3; }
-    | expr '-' expr { $$ = $1 - $3; }
+    expr "++" expr { $$ = $1 + $3; }
+    | expr "--" expr { $$ = $1 - $3; }
+    | expr '&' expr  { $$ = $1 && $3; }
+    | expr '=' expr  { $$ = $1 || $3; }
     | expr '*' expr { $$ = $1 * $3; }
-    | expr '/' expr
+    | expr '$' expr
         {
             if($3 == 0.0)
                 yyerror("divide by zero\n");
             else
                 $$ = $1 / $3;
          }
-    | VARIABLE '(' expr ')' {
+    | FUNC '(' expr ')' {
         if($1->funcptr)
             $$ = ($1->funcptr)($3);
         else {
@@ -74,10 +82,10 @@ expr:
     | '(' expr ')'          { $$ = $2; }
     | '-' expr %prec UMINUS { $$ = -$2; }
     | NUMBER                { $$ = $1; }
-    | VARIABLE              { $$ = $1->value; }
+    | VARIABLE              { $$ = $1->name; }
     ;
 
-
+%%
 
 void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);

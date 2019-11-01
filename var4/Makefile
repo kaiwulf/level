@@ -14,5 +14,5 @@ lex.yy.o level.tab.o: sym.h
 level.tab.c "lexer.tab.h": level.y
 	$(BISON) level.y
 
-lex.yy.c: lexer.lex
+lex.yy.c "level.tab.h": lexer.lex
 	$(LEX) lexer.lex
