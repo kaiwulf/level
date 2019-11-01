@@ -2,11 +2,18 @@
  *	Symbol table for level interpreter
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define NSYMS 20	/* maximum number of symbols */
 
 typedef struct sym_rec sym_rec;
 
+struct symtab *symlook();
+
 struct sym_rec {
+    double value;
     char *name;
     struct sym_rec *next;
 };

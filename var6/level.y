@@ -1,7 +1,4 @@
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
     #include "sym.h"
 
     #define YYDEBUG 1
@@ -9,7 +6,7 @@
     int yylex();
     void yyerror(const char *s);
     void install(char *sym_name) {
-        hash_table *s;
+        sym_rec *s;
         s = get_sym(sym_name);
         if(s == 0) s = put_sym(sym_name);
         else {
@@ -25,42 +22,53 @@
 %union {
     int dval;
     char letter;
-    struct hash_table *sym;
+    symtab *symtab;
+    sym_rec *sym_rec;
 }
 
-%token <sym> IDENT
-%token <dval> NUM
-%token <char> LETTER
+%token <sym_rec> VARIABLE
+%token <symtab> FUNC
+%token <char *> IDENT
+%token <dval> NUMBER
 %token LET WHAT THEN
 %left '&' '='
-%left '++' '-'
+%left "++" "--"
 %left '*' '$' '%'
-%right '^'
+// %right '^'
 %nonassoc UMINUS
 
 %type <dval> expr
+
 %%
 
 statement_list: statement '\n'
     | statement_list statement '\n'
-
-statement: VARIABLE '=' expr    { $1->value = $3; }
-    | expr     { printf("%.10g\n", $1); }
     ;
 
+statement: VARIABLE "==" expr    { $1->value = $3; }
+    | expr     { printf("%.10g\n", $1); }
+    | assignment
+    ;
+
+assignment: /* empty */
+    | LETTER IDENT ';' { install($2); }
+    | NUMBER IDENT ';'    { install($2); }
+    ;
 
 expr:
-    expr '+' expr { $$ = $1 + $3; }
-    | expr '-' expr { $$ = $1 - $3; }
+    expr "++" expr { $$ = $1 + $3; }
+    | expr "--" expr { $$ = $1 - $3; }
+    | expr '&' expr  { $$ = $1 && $3; }
+    | expr '=' expr  { $$ = $1 || $3; }
     | expr '*' expr { $$ = $1 * $3; }
-    | expr '/' expr
+    | expr '$' expr
         {
             if($3 == 0.0)
                 yyerror("divide by zero\n");
             else
                 $$ = $1 / $3;
          }
-    | VARIABLE '(' expr ')' {
+    | FUNC '(' expr ')' {
         if($1->funcptr)
             $$ = ($1->funcptr)($3);
         else {
@@ -71,10 +79,10 @@ expr:
     | '(' expr ')'          { $$ = $2; }
     | '-' expr %prec UMINUS { $$ = -$2; }
     | NUMBER                { $$ = $1; }
-    | VARIABLE              { $$ = $1->value; }
+    | VARIABLE              { $$ = $1->name; }
     ;
 
-
+%%
 
 void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);

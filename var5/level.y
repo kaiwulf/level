@@ -1,7 +1,4 @@
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
     #include "sym.h"
 
     #define YYDEBUG 1
@@ -25,14 +22,13 @@
 %union {
     int dval;
     char letter;
+    struct symtab *symp;
     struct sym_rec *sym_rec;
 }
 
 %token <sym_rec> VARIABLE
-%token <symtab> FUNC
-%token <char> IDENT
+%token <symp> FUNC
 %token <dval> NUMBER
-%token <char> LETTER
 %token LET WHAT THEN
 %left '&' '='
 %left "++" "--"
@@ -48,14 +44,8 @@ statement_list: statement '\n'
     | statement_list statement '\n'
     ;
 
-statement: VARIABLE "==" expr    { $1->name = $3; }
+statement: VARIABLE "==" expr    { $1->value = $3; }
     | expr     { printf("%.10g\n", $1); }
-    | assignment
-    ;
-
-assignment: /* empty */
-    | LETTER IDENT ';' { install($1); }
-    | NUMBER IDENT ';'    { install($1); }
     ;
     
 expr:
@@ -82,7 +72,7 @@ expr:
     | '(' expr ')'          { $$ = $2; }
     | '-' expr %prec UMINUS { $$ = -$2; }
     | NUMBER                { $$ = $1; }
-    | VARIABLE              { $$ = $1->name; }
+    | VARIABLE              { $$ = $1->value; }
     ;
 
 %%
