@@ -1,4 +1,7 @@
 %{
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
     #include "sym.h"
 
     #define YYDEBUG 1
@@ -6,7 +9,7 @@
     int yylex();
     void yyerror(const char *s);
     void install(char *sym_name) {
-        sym_rec *s;
+        struct sym_rec *s;
         s = get_sym(sym_name);
         if(s == 0) s = put_sym(sym_name);
         else {
@@ -84,6 +87,22 @@ void yyerror(const char *s) {
 void addfunc(char *name, double (*func)()) {
     struct symtab *sp = symlook(name);
     sp->funcptr = func;
+}
+
+struct symtab *symlook(char *s) {
+    char *p;
+    struct symtab *sp;
+
+    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+        if(sp->name && !strcmp(sp->name, s))
+            return sp;
+        if(!sp->name) {
+            sp->name = strdup(s);
+            return sp;
+        }
+    }
+    yyerror("Too many symbols");
+    exit(1);
 }
 
 int main(void) {

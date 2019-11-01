@@ -8,9 +8,7 @@
 
 #define NSYMS 20	/* maximum number of symbols */
 
-typedef struct sym_rec sym_rec;
-
-struct symtab *symlook();
+struct symtab *symlook(char *s);
 
 struct sym_rec {
     double value;
@@ -25,13 +23,13 @@ struct symtab {
 } symtab[NSYMS];
 
 
-sym_rec *sym_table = NULL;
-sym_rec *put_sym();
-sym_rec *get_sym();
+struct sym_rec *sym_table = NULL;
+struct sym_rec *put_sym();
+struct sym_rec *get_sym();
 
-sym_rec* put_sym(char *sym_name) {
-    sym_rec *ptr;
-    ptr = (sym_rec *) malloc(sizeof(sym_rec));
+struct sym_rec* put_sym(char *sym_name) {
+    struct sym_rec *ptr;
+    ptr = (struct sym_rec *) malloc(sizeof(struct sym_rec));
     ptr->name = (char *) malloc(strlen(sym_name)+1);
     strcpy(ptr->name, sym_name);
     ptr->next = (struct sym_rec *)sym_table;
@@ -40,9 +38,9 @@ sym_rec* put_sym(char *sym_name) {
     return ptr;
 }
 
-sym_rec *get_sym(char *sym_name) {
-    sym_rec *ptr;
-    for(ptr = sym_table; ptr != NULL; ptr = (sym_rec *) ptr->next) {
+struct sym_rec *get_sym(char *sym_name) {
+    struct sym_rec *ptr;
+    for(ptr = sym_table; ptr != NULL; ptr = (struct sym_rec *) ptr->next) {
         if(strcmp(ptr->name, sym_name) == 0)
             return ptr;
     }

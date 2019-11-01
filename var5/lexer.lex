@@ -1,6 +1,6 @@
 %{
     #include "level.tab.h"
-    #include "sym.h"
+    extern struct symtab *symlook(char *s);
     /* extern int yylval; */
 %}
 
