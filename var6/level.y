@@ -55,6 +55,11 @@ assignment: /* empty */
     | NUMBER IDENT ';'    { install($2); }
     ;
 
+if_stmt:
+  "what" expr ':' stmt "end what;"
+| "what" expr ':' stmt "then" stmt "end what;"
+;
+
 expr:
     expr "++" expr { $$ = $1 + $3; }
     | expr "--" expr { $$ = $1 - $3; }
