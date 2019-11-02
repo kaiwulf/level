@@ -6,6 +6,7 @@
 
     #define YYDEBUG 1
 
+    extern struct sym_rec *g_sym_table;
     int yylex();
     void yyerror(const char *s);
     void install(char *sym_name) {
@@ -20,17 +21,17 @@
     void context_check(char *sym_name) {
         if(get_sym(sym_name) == 0) printf("%s is an undeclared identifier\n", sym_name);
     }
+
 %}
 
 %union {
     int dval;
     char letter;
-    struct symtab *symp;
     struct sym_rec *sym_rec;
 }
 
 %token <sym_rec> VARIABLE
-%token <symp> FUNC
+%token <sym_rec> FUNC
 %token <dval> NUMBER
 %token LET WHAT THEN
 %left '&' '='
@@ -47,7 +48,7 @@ statement_list: statement '\n'
     | statement_list statement '\n'
     ;
 
-statement: VARIABLE "==" expr    { $1->value = $3; }
+statement: VARIABLE '==' expr    { $1->value = $3; }
     | expr     { printf("%.10g\n", $1); }
     ;
     
@@ -85,29 +86,32 @@ void yyerror(const char *s) {
 }
 
 void addfunc(char *name, double (*func)()) {
-    struct symtab *sp = symlook(name);
+    struct sym_rec *sp = symlook(name);
     sp->funcptr = func;
 }
 
-struct symtab *symlook(char *s) {
+struct sym_rec *symlook(char *s) {
     char *p;
-    struct symtab *sp;
+    struct sym_rec *sp;
 
-    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+    for(sp = g_sym_table; sp != NULL; sp = sp->next) {
+        printf("%s\n", sp->name);
         if(sp->name && !strcmp(sp->name, s))
             return sp;
-        if(!sp->name) {
+        if(sp->name) {
             sp->name = strdup(s);
             return sp;
         }
     }
     yyerror("Too many symbols");
-    exit(1);
+    // exit(1);
 }
 
 int main(void) {
-
     extern double sqrt(), exp(), log();
+    extern struct sym_rec *create();
+    
+    g_sym_table = create();
 
     addfunc("sqrt", sqrt);
     addfunc("exp", exp);
