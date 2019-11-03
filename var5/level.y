@@ -1,4 +1,11 @@
 %{
+    /*
+    * Parser for level programming language.
+    * Sections of code borroed and adopted from
+    * "Compiler Construction using Flex and Bison"
+    * by Anthony A. Aaby of Wall Walla College.
+    */
+
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
@@ -25,18 +32,17 @@
 %}
 
 %union {
-    int dval;
-    char letter;
+    double dval;
     struct sym_rec *sym_rec;
 }
 
 %token <sym_rec> VARIABLE
 %token <sym_rec> FUNC
 %token <dval> NUMBER
+%token ADDOP SUBOP DIVOP
 %token LET WHAT THEN
-%left '&' '='
-%left "++" "--"
-%left '*' '$' '%'
+%left '*' DIVOP
+%left ADDOP SUBOP
 // %right '^'
 %nonassoc UMINUS
 
@@ -48,17 +54,14 @@ statement_list: statement '\n'
     | statement_list statement '\n'
     ;
 
-statement: VARIABLE '==' expr    { $1->value = $3; }
+statement: VARIABLE '=' expr    { $1->value = $3; }
     | expr     { printf("%.10g\n", $1); }
     ;
     
 expr:
-    expr "++" expr { $$ = $1 + $3; }
-    | expr "--" expr { $$ = $1 - $3; }
-    | expr '&' expr  { $$ = $1 && $3; }
-    | expr '=' expr  { $$ = $1 || $3; }
+      expr SUBOP expr { $$ = $1 - $3; }
     | expr '*' expr { $$ = $1 * $3; }
-    | expr '$' expr
+    | expr DIVOP expr
         {
             if($3 == 0.0)
                 yyerror("divide by zero\n");
@@ -77,6 +80,7 @@ expr:
     | '-' expr %prec UMINUS { $$ = -$2; }
     | NUMBER                { $$ = $1; }
     | VARIABLE              { $$ = $1->value; }
+    | expr ADDOP expr { $$ = $1 + $3; }
     ;
 
 %%
@@ -96,9 +100,9 @@ struct sym_rec *symlook(char *s) {
 
     for(sp = g_sym_table; sp != NULL; sp = sp->next) {
         printf("%s\n", sp->name);
-        if(sp->name && !strcmp(sp->name, s))
+        if(sp->name != NULL && strcmp(sp->name, s) == 0)
             return sp;
-        if(sp->name) {
+        if(sp->name != NULL) {
             sp->name = strdup(s);
             return sp;
         }

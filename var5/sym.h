@@ -46,7 +46,7 @@ struct sym_rec* put_sym(char *sym_name) {
     ptr = (struct sym_rec *) malloc(sizeof(struct sym_rec));
     ptr->name = (char *) malloc(strlen(sym_name)+1);
     strcpy(ptr->name, sym_name);
-    ptr->next = (struct sym_rec *)g_sym_table;
+    ptr->next = (struct sym_rec *) g_sym_table;
     g_sym_table = ptr;
 
     return ptr;
