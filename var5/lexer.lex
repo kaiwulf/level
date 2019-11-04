@@ -9,6 +9,7 @@
 \+\+        { return ADDOP; }
 \-\-        { return SUBOP; }
 \$          { return DIVOP; }
+==          { return EQOP; }
 [ \t]   ;
 [A-Za-z][A-Za-z0-9]*    {
     struct sym_rec *sp = symlook(yytext);

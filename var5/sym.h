@@ -24,11 +24,14 @@ struct symtab {
 } symtab[NSYMS];
 
 
-struct sym_rec *put_sym();
-struct sym_rec *get_sym();
+struct sym_rec *put_sym(char *);
+struct sym_rec *get_sym(char *);
 struct sym_rec *create();
+// struct sym_rec *get_head();
+// void set_head(struct sym_rec *);
 
 struct sym_rec *g_sym_table;
+struct sym_rec g_sym_head;
 
 struct sym_rec *create() {
     struct sym_rec *sym_table;
@@ -54,9 +57,11 @@ struct sym_rec* put_sym(char *sym_name) {
 
 struct sym_rec *get_sym(char *sym_name) {
     struct sym_rec *ptr;
-    for(ptr = g_sym_table; ptr != NULL; ptr = (struct sym_rec *) ptr->next) {
+    for(ptr = &g_sym_head; ptr != NULL; ptr = (struct sym_rec *) ptr->next) {
         if(strcmp(ptr->name, sym_name) == 0)
             return ptr;
     }
     return 0;
 }
+
+// https://stackoverflow.com/questions/20932623/global-pointer-in-linked-list

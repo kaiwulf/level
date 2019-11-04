@@ -14,6 +14,7 @@
     #define YYDEBUG 1
 
     extern struct sym_rec *g_sym_table;
+    extern struct sym_rec g_sym_head;
     int yylex();
     void yyerror(const char *s);
     void install(char *sym_name) {
@@ -39,7 +40,7 @@
 %token <sym_rec> VARIABLE
 %token <sym_rec> FUNC
 %token <dval> NUMBER
-%token ADDOP SUBOP DIVOP
+%token ADDOP SUBOP DIVOP EQOP
 %token LET WHAT THEN
 %left '*' DIVOP
 %left ADDOP SUBOP
@@ -54,7 +55,9 @@ statement_list: statement '\n'
     | statement_list statement '\n'
     ;
 
-statement: VARIABLE '=' expr    { $1->value = $3; }
+statement:
+      VARIABLE EQOP expr    { struct sym_rec *sym = symlook($1->name);
+                              sym->value = $3; }
     | expr     { printf("%.10g\n", $1); }
     ;
     
@@ -79,7 +82,7 @@ expr:
     | '(' expr ')'          { $$ = $2; }
     | '-' expr %prec UMINUS { $$ = -$2; }
     | NUMBER                { $$ = $1; }
-    | VARIABLE              { $$ = $1->value; }
+    | VARIABLE              { struct sym_rec *sym = get_sym($1->name); $$ = sym->value; }
     | expr ADDOP expr { $$ = $1 + $3; }
     ;
 
@@ -98,9 +101,9 @@ struct sym_rec *symlook(char *s) {
     char *p;
     struct sym_rec *sp;
 
-    for(sp = g_sym_table; sp != NULL; sp = sp->next) {
-        printf("%s\n", sp->name);
-        if(sp->name != NULL && strcmp(sp->name, s) == 0)
+    for(sp = &g_sym_head; sp != NULL; sp = sp->next) {
+        printf("sym name: %s\n", sp->name);
+        if(strcmp(sp->name, s) == 0)
             return sp;
         if(sp->name != NULL) {
             sp->name = strdup(s);
@@ -116,6 +119,7 @@ int main(void) {
     extern struct sym_rec *create();
     
     g_sym_table = create();
+    g_sym_head = *g_sym_table;
 
     addfunc("sqrt", sqrt);
     addfunc("exp", exp);
