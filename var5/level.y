@@ -93,6 +93,7 @@ void yyerror(const char *s) {
 
 void addfunc(char *name, double (*func)()) {
     struct sym_node *sp = symlook(name);
+    sp->name = strdup(name);
     sp->funcptr = func;
 }
 
@@ -101,16 +102,15 @@ struct sym_node *symlook(char *s) {
     struct sym_node *sp;
 
     for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
-        printf("sym name: %s\n", sp->name);
         if(strcmp(sp->name, s) == 0)
             return sp;
-        if(sp->name != NULL) {
+        else if(sp->name != NULL) {
             sp->name = strdup(s);
             return sp;
+        } else {
+            return NULL;
         }
     }
-    yyerror("Too many symbols");
-    // exit(1);
 }
 
 int main(void) {
