@@ -13,12 +13,11 @@
 
     #define YYDEBUG 1
 
-    extern struct sym_rec *g_sym_table;
-    extern struct sym_rec g_sym_head;
+    extern struct sym_list *g_sym_list;
     int yylex();
     void yyerror(const char *s);
     void install(char *sym_name) {
-        struct sym_rec *s;
+        struct sym_node *s;
         s = get_sym(sym_name);
         if(s == 0) s = put_sym(sym_name);
         else {
@@ -34,11 +33,11 @@
 
 %union {
     double dval;
-    struct sym_rec *sym_rec;
+    struct sym_node *sym_node;
 }
 
-%token <sym_rec> VARIABLE
-%token <sym_rec> FUNC
+%token <sym_node> VARIABLE
+%token <sym_node> FUNC
 %token <dval> NUMBER
 %token ADDOP SUBOP DIVOP EQOP
 %token LET WHAT THEN
@@ -56,7 +55,7 @@ statement_list: statement '\n'
     ;
 
 statement:
-      VARIABLE EQOP expr    { struct sym_rec *sym = symlook($1->name);
+      VARIABLE EQOP expr    { struct sym_node *sym = symlook($1->name);
                               sym->value = $3; }
     | expr     { printf("%.10g\n", $1); }
     ;
@@ -82,7 +81,7 @@ expr:
     | '(' expr ')'          { $$ = $2; }
     | '-' expr %prec UMINUS { $$ = -$2; }
     | NUMBER                { $$ = $1; }
-    | VARIABLE              { struct sym_rec *sym = get_sym($1->name); $$ = sym->value; }
+    | VARIABLE              { struct sym_node *sym = get_sym($1->name); $$ = sym->value; }
     | expr ADDOP expr { $$ = $1 + $3; }
     ;
 
@@ -93,16 +92,16 @@ void yyerror(const char *s) {
 }
 
 void addfunc(char *name, double (*func)()) {
-    struct sym_rec *sp = symlook(name);
+    struct sym_node *sp = symlook(name);
     sp->funcptr = func;
 }
 
-struct sym_rec *symlook(char *s) {
+struct sym_node *symlook(char *s) {
     char *p;
-    struct sym_rec *sp;
+    struct sym_node *sp;
 
-    for(sp = &g_sym_head; sp != NULL; sp = sp->next) {
-        printf("sym name: %s\n", sp->name);
+    for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
+        // printf("sym name: %s\n", sp->name);
         if(strcmp(sp->name, s) == 0)
             return sp;
         if(sp->name != NULL) {
@@ -116,10 +115,9 @@ struct sym_rec *symlook(char *s) {
 
 int main(void) {
     extern double sqrt(), exp(), log();
-    extern struct sym_rec *create();
-    
-    g_sym_table = create();
-    g_sym_head = *g_sym_table;
+    extern struct sym_list *list_create();
+
+    g_sym_list = list_create();
 
     addfunc("sqrt", sqrt);
     addfunc("exp", exp);

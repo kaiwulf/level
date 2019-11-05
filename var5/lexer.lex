@@ -1,6 +1,6 @@
 %{
     #include "level.tab.h"
-    extern struct sym_rec *symlook(char *s);
+    extern struct sym_node *symlook(char *s);
     /* extern int yylval; */
 %}
 
@@ -12,8 +12,8 @@
 ==          { return EQOP; }
 [ \t]   ;
 [A-Za-z][A-Za-z0-9]*    {
-    struct sym_rec *sp = symlook(yytext);
-    yylval.sym_rec = sp;
+    struct sym_node *sp = symlook(yytext);
+    yylval.sym_node = sp;
     return VARIABLE;
 }
 

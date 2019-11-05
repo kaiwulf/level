@@ -8,56 +8,66 @@
 
 #define NSYMS 20	/* maximum number of symbols */
 
-struct sym_rec *symlook(char *s);
+struct sym_node *symlook(char *s);
 
-struct sym_rec {
+struct sym_node {
     double value;
     char *name;
     double (*funcptr)();
-    struct sym_rec *next;
+    struct sym_node *next;
 };
 
-struct symtab {
-	char *name;
-    double (*funcptr)();
-	double value;
-} symtab[NSYMS];
+struct sym_list {
+    struct sym_node *head;
+};
 
-
-struct sym_rec *put_sym(char *);
-struct sym_rec *get_sym(char *);
-struct sym_rec *create();
+struct sym_node *put_sym(char *);
+struct sym_node *get_sym(char *);
+struct sym_list *list_create();
 // struct sym_rec *get_head();
 // void set_head(struct sym_rec *);
 
-struct sym_rec *g_sym_table;
-struct sym_rec g_sym_head;
+struct sym_list *g_sym_list;
 
-struct sym_rec *create() {
-    struct sym_rec *sym_table;
-    sym_table = (struct sym_rec *) malloc(sizeof(struct sym_rec));
-    sym_table->next = (struct sym_rec *) malloc(sizeof(struct sym_rec));
-    sym_table->next = NULL;
-    sym_table->funcptr = NULL;
-    sym_table->name = "print";
-    sym_table->value = 0;
-    return sym_table;
+struct sym_list *list_create() {
+    struct sym_node *node;
+    node = (struct sym_node *) malloc(sizeof(struct sym_node));
+    node->next = (struct sym_node *) malloc(sizeof(struct sym_node));
+    node->next = NULL;
+    node->funcptr = NULL;
+    node->name = "print";
+    node->value = 0;
+
+    struct sym_list *list;
+    list = (struct sym_list *) malloc(sizeof(struct sym_list));
+    list->head = NULL;
+    
+    return list;
 }
 
-struct sym_rec* put_sym(char *sym_name) {
-    struct sym_rec *ptr;
-    ptr = (struct sym_rec *) malloc(sizeof(struct sym_rec));
-    ptr->name = (char *) malloc(strlen(sym_name)+1);
-    strcpy(ptr->name, sym_name);
-    ptr->next = (struct sym_rec *) g_sym_table;
-    g_sym_table = ptr;
+struct sym_node* put_sym(char *sym_name) {
+    struct sym_node *node;
+    node = (struct sym_node *) malloc(sizeof(struct sym_node));
+    node->name = (char *) malloc(strlen(sym_name)+1);
+    strcpy(node->name, sym_name);
+    node->next = (struct sym_node *) malloc(sizeof(struct sym_node));
+    node->next = NULL;
+    
+    if(g_sym_list->head == NULL) {
+        g_sym_list->head = node;
+    } else {
+        struct sym_node *iter = g_sym_list->head;
 
-    return ptr;
+        while(iter->next) iter = iter->next;
+        iter->next = node;
+    }
+
+    return node;
 }
 
-struct sym_rec *get_sym(char *sym_name) {
-    struct sym_rec *ptr;
-    for(ptr = &g_sym_head; ptr != NULL; ptr = (struct sym_rec *) ptr->next) {
+struct sym_node *get_sym(char *sym_name) {
+    struct sym_node *ptr;
+    for(ptr = g_sym_list->head; ptr != NULL; ptr = ptr->next) {
         if(strcmp(ptr->name, sym_name) == 0)
             return ptr;
     }
