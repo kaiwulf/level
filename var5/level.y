@@ -101,7 +101,7 @@ struct sym_node *symlook(char *s) {
     struct sym_node *sp;
 
     for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
-        // printf("sym name: %s\n", sp->name);
+        printf("sym name: %s\n", sp->name);
         if(strcmp(sp->name, s) == 0)
             return sp;
         if(sp->name != NULL) {
