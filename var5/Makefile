@@ -2,11 +2,11 @@ LEX		= flex -I
 BISON	= bison -d
 CC		= gcc
 OBJS	= level.tab.o lex.yy.o
-LFLAGS	= -lfl -lm
+LFLAGS	= -lfl -lm -g3
 OFLAGS	= -fPIC -shared
 
 level:		$(OBJS)
-			$(CC) -o level level.tab.o lex.yy.o $(LFLAGS) 
+			$(CC) -o level level.tab.o lex.yy.o $(LFLAGS)
 
 lex.yy.o:	lex.yy.c level.tab.h
 			$(CC) $(LFLAGS) $(OFLAGS) -c lex.yy.c -o lex.yy.o

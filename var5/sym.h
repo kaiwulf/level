@@ -8,7 +8,7 @@
 
 #define NSYMS 20	/* maximum number of symbols */
 
-struct sym_node *symlook(char *s);
+struct sym_node *symlook(const char *s);
 
 struct sym_node {
     double value;
@@ -35,13 +35,13 @@ struct sym_list *list_create() {
     node->next = (struct sym_node *) malloc(sizeof(struct sym_node));
     node->next = NULL;
     node->funcptr = NULL;
-    node->name = "print";
+    node->name = NULL;
     node->value = 0;
 
     struct sym_list *list;
     list = (struct sym_list *) malloc(sizeof(struct sym_list));
-    list->head = NULL;
-    
+    list->head = node;
+
     return list;
 }
 
@@ -52,7 +52,7 @@ struct sym_node* put_sym(char *sym_name) {
     strcpy(node->name, sym_name);
     node->next = (struct sym_node *) malloc(sizeof(struct sym_node));
     node->next = NULL;
-    
+
     if(g_sym_list->head == NULL) {
         g_sym_list->head = node;
     } else {

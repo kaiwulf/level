@@ -9,6 +9,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+    #include <assert.h>
     #include "sym.h"
 
     #define YYDEBUG 1
@@ -59,7 +60,7 @@ statement:
                               sym->value = $3; }
     | expr     { printf("%.10g\n", $1); }
     ;
-    
+
 expr:
       expr SUBOP expr { $$ = $1 - $3; }
     | expr '*' expr { $$ = $1 * $3; }
@@ -91,24 +92,25 @@ void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);
 }
 
-void addfunc(char *name, double (*func)()) {
+void addfunc(const char *name, double (*func)()) {
+
     struct sym_node *sp = symlook(name);
     sp->name = strdup(name);
     sp->funcptr = func;
 }
 
-struct sym_node *symlook(char *s) {
+struct sym_node *symlook(const char *s) {
     char *p;
     struct sym_node *sp;
-
+    printf("s is %s\n", s);
     for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
-        if(strcmp(sp->name, s) == 0)
-            return sp;
-        else if(sp->name != NULL) {
+        if(sp->name != NULL) {
+            if(strcmp(sp->name, s) == 0)
+                return sp;
+        }
+        else if(sp->name == NULL) {
             sp->name = strdup(s);
             return sp;
-        } else {
-            return NULL;
         }
     }
 }
@@ -118,7 +120,6 @@ int main(void) {
     extern struct sym_list *list_create();
 
     g_sym_list = list_create();
-
     addfunc("sqrt", sqrt);
     addfunc("exp", exp);
     addfunc("log", log);
