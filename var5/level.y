@@ -92,24 +92,27 @@ void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);
 }
 
-void addfunc(const char *name, double (*func)()) {
+void addfunc(char *name, double (*func)()) {
 
     struct sym_node *sp = symlook(name);
-    sp->name = strdup(name);
+    sp->name = strndup(name, strlen(name)+1);
     sp->funcptr = func;
 }
 
-struct sym_node *symlook(const char *s) {
+struct sym_node *symlook(char *s) {
     char *p;
     struct sym_node *sp;
     printf("s is %s\n", s);
     for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
+        printf("in loop0\n");
         if(sp->name != NULL) {
+            printf("in loop1\n");
             if(strcmp(sp->name, s) == 0)
                 return sp;
         }
-        else if(sp->name == NULL) {
-            sp->name = strdup(s);
+        else if(sp == NULL) {
+            printf("in loop2\n");
+            sp = node_create(NULL, NULL, s, 0);
             return sp;
         }
     }

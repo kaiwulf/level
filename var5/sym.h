@@ -8,7 +8,7 @@
 
 #define NSYMS 20	/* maximum number of symbols */
 
-struct sym_node *symlook(const char *s);
+struct sym_node *symlook(char *s);
 
 struct sym_node {
     double value;
@@ -29,18 +29,25 @@ struct sym_list *list_create();
 
 struct sym_list *g_sym_list;
 
-struct sym_list *list_create() {
-    struct sym_node *node;
-    node = (struct sym_node *) malloc(sizeof(struct sym_node));
-    node->next = (struct sym_node *) malloc(sizeof(struct sym_node));
-    node->next = NULL;
-    node->funcptr = NULL;
-    node->name = NULL;
-    node->value = 0;
+struct sym_node *node_create(struct sym_node *node, double (*funcptr)(), char *name, double value) {
 
-    struct sym_list *list;
-    list = (struct sym_list *) malloc(sizeof(struct sym_list));
-    list->head = node;
+    if(node == NULL) {
+        node = (struct sym_node *) malloc(sizeof(struct sym_node));;
+    } else {
+        node->next = (struct sym_node *) malloc(sizeof(struct sym_node));
+        node->next = node;
+        node->funcptr = funcptr;
+        node->name = name;
+        node->value = value;
+        return node;
+    }
+}
+
+struct sym_list *list_create() {
+
+    struct sym_list *list = malloc(sizeof(struct sym_list));
+
+    list->head = node_create(NULL, NULL, NULL, 0);
 
     return list;
 }
