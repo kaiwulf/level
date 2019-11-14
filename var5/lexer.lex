@@ -12,8 +12,7 @@
 ==          { return EQOP; }
 [ \t]   ;
 [A-Za-z][A-Za-z0-9]*    {
-    struct sym_node *sp = symlook(yytext);
-    yylval.sym_node = sp;
+    yylval.str = strndup(yytext, strlen(yytext)+1);
     return VARIABLE;
 }
 

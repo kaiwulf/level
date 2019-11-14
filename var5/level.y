@@ -15,12 +15,15 @@
     #define YYDEBUG 1
 
     extern struct sym_list *g_sym_list;
+    extern double sqrt(), exp(), log();
+    extern struct sym_list *list_create();
+
     int yylex();
     void yyerror(const char *s);
-    void install(char *sym_name) {
+    void install(char *sym_name, double val) {
         struct sym_node *s;
         s = get_sym(sym_name);
-        if(s == 0) s = put_sym(sym_name);
+        if(s != NULL) s = put_sym(sym_name, val);
         else {
             printf("%s is already defined\n", sym_name);
         }
@@ -34,17 +37,19 @@
 
 %union {
     double dval;
+    char *str;
+
     struct sym_node *sym_node;
 }
 
-%token <sym_node> VARIABLE
+%token <str> VARIABLE
 %token <sym_node> FUNC
 %token <dval> NUMBER
 %token ADDOP SUBOP DIVOP EQOP
 %token LET WHAT THEN
 %left '*' DIVOP
 %left ADDOP SUBOP
-// %right '^'
+%right '^'
 %nonassoc UMINUS
 
 %type <dval> expr
@@ -56,8 +61,7 @@ statement_list: statement '\n'
     ;
 
 statement:
-      VARIABLE EQOP expr    { struct sym_node *sym = symlook($1->name);
-                              sym->value = $3; }
+      VARIABLE EQOP expr    { install($1, $3); }
     | expr     { printf("%.10g\n", $1); }
     ;
 
@@ -81,8 +85,10 @@ expr:
     }
     | '(' expr ')'          { $$ = $2; }
     | '-' expr %prec UMINUS { $$ = -$2; }
+    | expr '^' expr         { $$ = pow($1, $3); }
     | NUMBER                { $$ = $1; }
-    | VARIABLE              { struct sym_node *sym = get_sym($1->name); $$ = sym->value; }
+    | VARIABLE              { struct sym_node *node = symlook($1);
+                              $$ = node->value; }
     | expr ADDOP expr { $$ = $1 + $3; }
     ;
 
@@ -102,26 +108,28 @@ void addfunc(char *name, double (*func)()) {
 struct sym_node *symlook(char *s) {
     char *p;
     struct sym_node *sp;
-    printf("s is %s\n", s);
     for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
         printf("in loop0\n");
-        if(sp->name != NULL) {
-            printf("in loop1\n");
-            if(strcmp(sp->name, s) == 0)
-                return sp;
-        }
-        else if(sp == NULL) {
+        if(sp->name != NULL) { /* If a symbol is in the linked list */
+            if(sp->next == NULL) { /* And the next node is empty, create a new node and insert string */
+                printf("in loop1\n");
+                sp->next = node_create(NULL, NULL, s, 0);
+            } else if(sp->next->name == NULL) {    /* If node exists and the string is null, copy s to string */
+                // ...
+            }
+
+        } else if(strcmp(sp->name, s) == 0) /* or else, string is found and return node */
+            return sp;
+
+        /* else if(sp->name == NULL) {
             printf("in loop2\n");
             sp = node_create(NULL, NULL, s, 0);
-            return sp;
+            return sp; */
         }
     }
 }
 
 int main(void) {
-    extern double sqrt(), exp(), log();
-    extern struct sym_list *list_create();
-
     g_sym_list = list_create();
     addfunc("sqrt", sqrt);
     addfunc("exp", exp);
