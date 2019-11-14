@@ -25,8 +25,7 @@ struct sym_list {
 struct sym_node *put_sym(char *, double);
 struct sym_node *get_sym(char *);
 struct sym_list *list_create();
-// struct sym_rec *get_head();
-// void set_head(struct sym_rec *);
+struct sym_node *symlook(char *);
 
 struct sym_list *g_sym_list;
 
@@ -55,24 +54,10 @@ struct sym_list *list_create() {
 }
 
 struct sym_node* put_sym(char *sym_name, double val) {
-    struct sym_node *node = node_create(NULL, NULL, sym_name, val);
 
-    // node = (struct sym_node *) malloc(sizeof(struct sym_node));
-    // node->name = (char *) malloc(strlen(sym_name)+1);
-    // strcpy(node->name, sym_name);
-    // node->next = (struct sym_node *) malloc(sizeof(struct sym_node));
-    // node->next = NULL;
-
-    if(g_sym_list->head == NULL) {
-        g_sym_list->head = node;
-    } else {
-        struct sym_node *iter = g_sym_list->head;
-
-        while(iter->next) iter = iter->next;
-        iter->next = node;
-    }
-
-    return node;
+    struct sym_node *sym = symlook(sym_name);
+    sym->value = val;
+    return sym;
 }
 
 struct sym_node *get_sym(char *sym_name) {
@@ -83,8 +68,8 @@ struct sym_node *get_sym(char *sym_name) {
                 return ptr;
             else
                 return NULL;
-        } else if(prt->name == NULL) {
-            
+        } else if(ptr->name == NULL) {
+
         }
     }
 }

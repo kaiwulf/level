@@ -17,15 +17,16 @@
     extern struct sym_list *g_sym_list;
     extern double sqrt(), exp(), log();
     extern struct sym_list *list_create();
+    extern struct sym_node *put_sym(char *, double);
 
     int yylex();
     void yyerror(const char *s);
     void install(char *sym_name, double val) {
         struct sym_node *s;
         s = get_sym(sym_name);
-        if(s != NULL) s = put_sym(sym_name, val);
+        if(s == NULL) s = put_sym(sym_name, val);
         else {
-            printf("%s is already defined\n", sym_name);
+            printf("symbol already exists\n");
         }
     }
 
@@ -101,7 +102,7 @@ void yyerror(const char *s) {
 void addfunc(char *name, double (*func)()) {
 
     struct sym_node *sp = symlook(name);
-    sp->name = strndup(name, strlen(name)+1);
+    /*sp->name = strndup(name, strlen(name)+1);*/
     sp->funcptr = func;
 }
 
@@ -109,22 +110,17 @@ struct sym_node *symlook(char *s) {
     char *p;
     struct sym_node *sp;
     for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
-        printf("in loop0\n");
-        if(sp->name != NULL) { /* If a symbol is in the linked list */
-            if(sp->next == NULL) { /* And the next node is empty, create a new node and insert string */
-                printf("in loop1\n");
-                sp->next = node_create(NULL, NULL, s, 0);
-            } else if(sp->next->name == NULL) {    /* If node exists and the string is null, copy s to string */
-                // ...
-            }
-
-        } else if(strcmp(sp->name, s) == 0) /* or else, string is found and return node */
+        if(sp->name != NULL) {                                      /* If a symbol is in the linked list... */
+            if(strcmp(sp->name, s) != 0 && sp->next == NULL) {      /* ...and the symbols are different and the next node is empty... */
+                sp->next = node_create(NULL, NULL, s, 0);           /* ...create a new node and insert string... */
+            } else if(sp->next != NULL && sp->next->name == NULL) { /* ...else if next node exists and the string is null... */
+                strncpy(sp->next->name, s, strlen(s)+1);            /* ...copy s to node's string field... */
+            } else if(strcmp(sp->name, s) == 0)                     /* else if the string and symbol are the same, return the node.  */
+                return sp;
+        return sp;
+        } else if(sp->name == NULL) {
+            sp->name = strndup(s, strlen(s)+1);
             return sp;
-
-        /* else if(sp->name == NULL) {
-            printf("in loop2\n");
-            sp = node_create(NULL, NULL, s, 0);
-            return sp; */
         }
     }
 }
