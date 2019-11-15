@@ -9,8 +9,6 @@
 
 #define NSYMS 20	/* maximum number of symbols */
 
-struct sym_node *symlook(char *s);
-
 struct sym_node {
     double value;
     char *name;
@@ -25,7 +23,8 @@ struct sym_list {
 struct sym_node *put_sym(char *, double);
 struct sym_node *get_sym(char *);
 struct sym_list *list_create();
-struct sym_node *symlook(char *);
+struct sym_node *symlook(char *, const char *);
+struct sym_node *add_to_table(char *);
 
 struct sym_list *g_sym_list;
 
@@ -55,9 +54,28 @@ struct sym_list *list_create() {
 
 struct sym_node* put_sym(char *sym_name, double val) {
 
-    struct sym_node *sym = symlook(sym_name);
+    struct sym_node *sym = add_to_table(sym_name);
     sym->value = val;
     return sym;
+}
+
+struct sym_node *add_to_table(char *s) {
+    struct sym_node *sp = malloc(sizeof(struct sym_node *));
+
+    for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
+        if(sp->name != NULL) {                                      /* If a symbol is in the linked list... */
+            if(strcmp(sp->name, s) != 0 && sp->next == NULL) {      /* ...and the symbols are different and the next node is empty... */
+                sp->next = node_create(NULL, NULL, s, 0);           /* ...create a new node and insert string... */
+            } else if(sp->next != NULL && sp->next->name == NULL) { /* ...else if next node exists and the string is null... */
+                strncpy(sp->next->name, s, strlen(s)+1);            /* ...copy s to node's string field... */
+            } else if(strcmp(sp->name, s) == 0)                     /* else if the string and symbol are the same, return the node.  */
+                return sp;
+        return sp;
+        } else if(sp->name == NULL) {
+            sp->name = strndup(s, strlen(s)+1);
+            return sp;
+        }
+    }
 }
 
 struct sym_node *get_sym(char *sym_name) {
@@ -72,6 +90,18 @@ struct sym_node *get_sym(char *sym_name) {
 
         }
     }
+}
+
+void print_list() {
+    const struct sym_node *node = g_sym_list->head;
+
+    printf("{");
+    while(node) {
+        if(node != g_sym_list->head) printf("; ");
+        printf("%s, %.10g", node->value, node->name);
+        node = node->next;
+    }
+    printf("}\n");
 }
 
 // https://stackoverflow.com/questions/20932623/global-pointer-in-linked-list

@@ -10,6 +10,7 @@
 \-\-        { return SUBOP; }
 \$          { return DIVOP; }
 ==          { return EQOP; }
+print       { return PRINT; }
 [ \t]   ;
 [A-Za-z][A-Za-z0-9]*    {
     yylval.str = strndup(yytext, strlen(yytext)+1);
