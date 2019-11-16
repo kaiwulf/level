@@ -92,7 +92,7 @@ expr:
     | NUMBER                { $$ = $1; }
     | VARIABLE              { struct sym_node *node = get_sym($1);
                               if(!node) yyerror("no such symbol");
-                              $$ = node->value; }
+                              else $$ = node->value; }
     | expr ADDOP expr { $$ = $1 + $3; }
     ;
 
