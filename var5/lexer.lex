@@ -11,6 +11,11 @@
 \$          { return DIVOP; }
 ==          { return EQOP; }
 print       { return PRINT; }
+what        { return WHAT; }
+then        { return THEN; }
+\[          { return RSQUARE; }
+\]          { return LSQUARE; }
+:           { return COLON; }
 [ \t]   ;
 [A-Za-z][A-Za-z0-9]*    {
     yylval.str = strndup(yytext, strlen(yytext)+1);

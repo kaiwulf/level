@@ -23,8 +23,8 @@ struct sym_list {
 struct sym_node *put_sym(char *, double);
 struct sym_node *get_sym(char *);
 struct sym_list *list_create();
-struct sym_node *symlook(char *, const char *);
-struct sym_node *add_to_table(char *);
+struct sym_node *symlook(char *, const char *, double);
+struct sym_node *add_to_table(char *, double);
 
 struct sym_list *g_sym_list;
 
@@ -54,25 +54,25 @@ struct sym_list *list_create() {
 
 struct sym_node* put_sym(char *sym_name, double val) {
 
-    struct sym_node *sym = add_to_table(sym_name);
-    sym->value = val;
+    struct sym_node *sym = add_to_table(sym_name, val);
     return sym;
 }
 
-struct sym_node *add_to_table(char *s) {
+struct sym_node *add_to_table(char *s, double v) {
     struct sym_node *sp = malloc(sizeof(struct sym_node *));
 
     for(sp = g_sym_list->head; sp != NULL; sp = sp->next) {
         if(sp->name != NULL) {                                      /* If a symbol is in the linked list... */
             if(strcmp(sp->name, s) != 0 && sp->next == NULL) {      /* ...and the symbols are different and the next node is empty... */
-                sp->next = node_create(NULL, NULL, s, 0);           /* ...create a new node and insert string... */
+                sp->next = node_create(NULL, NULL, s, v);           /* ...create a new node and insert string... */
             } else if(sp->next != NULL && sp->next->name == NULL) { /* ...else if next node exists and the string is null... */
                 strncpy(sp->next->name, s, strlen(s)+1);            /* ...copy s to node's string field... */
+                sp->next->value = v;                                /* ...and add value... */
             } else if(strcmp(sp->name, s) == 0)                     /* else if the string and symbol are the same, return the node.  */
                 return sp;
-        return sp;
         } else if(sp->name == NULL) {
             sp->name = strndup(s, strlen(s)+1);
+            sp->value = v;
             return sp;
         }
     }
@@ -84,12 +84,11 @@ struct sym_node *get_sym(char *sym_name) {
         if(ptr->name != NULL) {
             if(strcmp(ptr->name, sym_name) == 0)
                 return ptr;
-            else
-                return NULL;
-        } else if(ptr->name == NULL) {
+        } /*else if(ptr->name == NULL) {
 
-        }
+        }*/
     }
+    return NULL;
 }
 
 void print_list() {

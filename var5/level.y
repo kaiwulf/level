@@ -46,9 +46,9 @@
 %token <str> VARIABLE
 %token <sym_node> FUNC
 %token <dval> NUMBER
-%token PRINT
+%token PRINT COLON
 %token ADDOP SUBOP DIVOP EQOP
-%token LET WHAT THEN
+%token LET WHAT THEN RSQUARE LSQUARE
 %left '*' DIVOP
 %left ADDOP SUBOP
 %right '^'
@@ -90,7 +90,8 @@ expr:
     | '-' expr %prec UMINUS { $$ = -$2; }
     | expr '^' expr         { $$ = pow($1, $3); }
     | NUMBER                { $$ = $1; }
-    | VARIABLE              { struct sym_node *node = symlook($1, "true");
+    | VARIABLE              { struct sym_node *node = get_sym($1);
+                              if(!node) yyerror("no such symbol");
                               $$ = node->value; }
     | expr ADDOP expr { $$ = $1 + $3; }
     ;
@@ -103,23 +104,25 @@ void yyerror(const char *s) {
 
 void addfunc(char *name, double (*func)()) {
 
-    struct sym_node *sp = symlook(name, "true");
+    struct sym_node *sp = symlook(name, "true", 0);
     /*sp->name = strndup(name, strlen(name)+1);*/
     sp->funcptr = func;
 }
 
-struct sym_node *symlook(char *s, const char *add) {
+struct sym_node *symlook(char *s, const char *add, double d) {
     char *p;
     struct sym_node *sp;
 
     if(strcmp(add, "true") == 0) {
-        sp = add_to_table(s);
+        sp = add_to_table(s, d);
     } else if(strcmp(add, "false") == 0) {
         if(sp->name != NULL) {
             return sp;
         } else {
             return NULL;
         }
+    } else {
+        yyerror("no symbol to look up");
     }
     return sp;
 }
