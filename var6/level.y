@@ -15,39 +15,29 @@
     #define YYDEBUG 1
 
     extern struct sym_list *g_sym_list;
-    extern double sqrt(), exp(), log();
     extern struct sym_list *list_create();
     extern struct sym_node *put_sym(char *, double);
+    extern struct sym_node *symlook(char *, const char *, double);
+    extern void context_check(char *sym_name);
+    extern double sqrt(), exp(), log();
+    extern void install(char *, double);
 
     int yylex();
     void yyerror(const char *s);
-    void install(char *sym_name, double val) {
-        struct sym_node *s;
-        s = get_sym(sym_name);
-        if(s == NULL) s = put_sym(sym_name, val);
-        else {
-            printf("symbol already exists\n");
-        }
-    }
-
-    void context_check(char *sym_name) {
-        if(get_sym(sym_name) == 0) printf("%s is an undeclared identifier\n", sym_name);
-    }
 
 %}
 
 %union {
     double dval;
     char *str;
-
     struct sym_node *sym_node;
 }
 
 %token <str> VARIABLE
-%token <sym_node> FUNC
+%token <str> FUNC
 %token <dval> NUMBER
-%token PRINT COLON
-%token ADDOP SUBOP DIVOP EQOP
+%token PRINT COLON DOUBLECOL ENDCOL END
+%token ADDOP SUBOP DIVOP EQOP LET SEMICOL
 %token LET WHAT THEN RSQUARE LSQUARE
 %left '*' DIVOP
 %left ADDOP SUBOP
@@ -58,6 +48,10 @@
 
 %%
 
+program:
+        LET DOUBLECOL declarations ENDCOL body SEMICOL
+      | statement_list
+
 statement_list: statement '\n'
     | statement_list statement '\n'
     ;
@@ -66,7 +60,17 @@ statement:
       PRINT     { print_list(); }
     | VARIABLE EQOP expr    { install($1, $3); }
     | expr     { printf("%.10g\n", $1); }
+    | body SEMICOL
     ;
+
+body:
+      START COLON commands STOP
+
+commands:
+      commands command
+
+command:
+    WHAT LBLOCK expr RBLOCK COLON commands THEN commands END WHAT SEMICOL
 
 expr:
       expr SUBOP expr { $$ = $1 - $3; }
@@ -102,36 +106,8 @@ void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);
 }
 
-void addfunc(char *name, double (*func)()) {
-
-    struct sym_node *sp = symlook(name, "true", 0);
-    /*sp->name = strndup(name, strlen(name)+1);*/
-    sp->funcptr = func;
-}
-
-struct sym_node *symlook(char *s, const char *add, double d) {
-    char *p;
-    struct sym_node *sp;
-
-    if(strcmp(add, "true") == 0) {
-        sp = add_to_table(s, d);
-    } else if(strcmp(add, "false") == 0) {
-        if(sp->name != NULL) {
-            return sp;
-        } else {
-            return NULL;
-        }
-    } else {
-        yyerror("no symbol to look up");
-    }
-    return sp;
-}
-
 int main(void) {
     g_sym_list = list_create();
-    /*addfunc("sqrt", sqrt);
-    addfunc("exp", exp);
-    addfunc("log", log);*/
     yyparse();
 
     return 0;

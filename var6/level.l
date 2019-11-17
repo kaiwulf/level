@@ -13,9 +13,15 @@
 print       { return PRINT; }
 what        { return WHAT; }
 then        { return THEN; }
+let         { return LET; }
+end         { return END; }
 \[          { return RSQUARE; }
 \]          { return LSQUARE; }
 :           { return COLON; }
+\;          { return SEMICOL; }
+::          { return DOUBLECOL; }
+:\;         { return ENDCOL; }
+
 [ \t]   ;
 [A-Za-z][A-Za-z0-9]*    {
     yylval.str = strndup(yytext, strlen(yytext)+1);
