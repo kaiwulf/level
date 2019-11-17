@@ -1,40 +1,57 @@
 %{
+    /*
+    * Parser for level programming language.
+    * Sections of code borroed and adopted from
+    * "Compiler Construction using Flex and Bison"
+    * by Anthony A. Aaby of Wall Walla College.
+    */
+
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <assert.h>
     #include "sym.h"
 
     #define YYDEBUG 1
 
+    extern struct sym_list *g_sym_list;
+    extern double sqrt(), exp(), log();
+    extern struct sym_list *list_create();
+    extern struct sym_node *put_sym(char *, double);
+
     int yylex();
     void yyerror(const char *s);
-    void install(char *sym_name) {
-        sym_rec *s;
+    void install(char *sym_name, double val) {
+        struct sym_node *s;
         s = get_sym(sym_name);
-        if(s == 0) s = put_sym(sym_name);
+        if(s == NULL) s = put_sym(sym_name, val);
         else {
-            printf("%s is already defined\n", sym_name);
+            printf("symbol already exists\n");
         }
     }
 
     void context_check(char *sym_name) {
         if(get_sym(sym_name) == 0) printf("%s is an undeclared identifier\n", sym_name);
     }
+
 %}
 
 %union {
-    int dval;
-    char letter;
-    symtab *symtab;
-    sym_rec *sym_rec;
+    double dval;
+    char *str;
+
+    struct sym_node *sym_node;
 }
 
-%token <sym_rec> VARIABLE
-%token <symtab> FUNC
-%token <char *> IDENT
+%token <str> VARIABLE
+%token <sym_node> FUNC
 %token <dval> NUMBER
-%token LET WHAT THEN
-%left '&' '='
-%left "++" "--"
-%left '*' '$' '%'
-// %right '^'
+%token PRINT COLON
+%token ADDOP SUBOP DIVOP EQOP
+%token LET WHAT THEN RSQUARE LSQUARE
+%left '*' DIVOP
+%left ADDOP SUBOP
+%right '^'
 %nonassoc UMINUS
 
 %type <dval> expr
@@ -45,28 +62,16 @@ statement_list: statement '\n'
     | statement_list statement '\n'
     ;
 
-statement: VARIABLE "==" expr    { $1->value = $3; }
+statement:
+      PRINT     { print_list(); }
+    | VARIABLE EQOP expr    { install($1, $3); }
     | expr     { printf("%.10g\n", $1); }
-    | assignment
     ;
-
-assignment: /* empty */
-    | LETTER IDENT ';' { install($2); }
-    | NUMBER IDENT ';'    { install($2); }
-    ;
-
-if_stmt:
-  "what" expr ':' stmt "end what;"
-| "what" expr ':' stmt "then" stmt "end what;"
-;
 
 expr:
-    expr "++" expr { $$ = $1 + $3; }
-    | expr "--" expr { $$ = $1 - $3; }
-    | expr '&' expr  { $$ = $1 && $3; }
-    | expr '=' expr  { $$ = $1 || $3; }
+      expr SUBOP expr { $$ = $1 - $3; }
     | expr '*' expr { $$ = $1 * $3; }
-    | expr '$' expr
+    | expr DIVOP expr
         {
             if($3 == 0.0)
                 yyerror("divide by zero\n");
@@ -83,8 +88,12 @@ expr:
     }
     | '(' expr ')'          { $$ = $2; }
     | '-' expr %prec UMINUS { $$ = -$2; }
+    | expr '^' expr         { $$ = pow($1, $3); }
     | NUMBER                { $$ = $1; }
-    | VARIABLE              { $$ = $1->name; }
+    | VARIABLE              { struct sym_node *node = get_sym($1);
+                              if(!node) yyerror("no such symbol");
+                              else $$ = node->value; }
+    | expr ADDOP expr { $$ = $1 + $3; }
     ;
 
 %%
@@ -94,17 +103,35 @@ void yyerror(const char *s) {
 }
 
 void addfunc(char *name, double (*func)()) {
-    struct symtab *sp = symlook(name);
+
+    struct sym_node *sp = symlook(name, "true", 0);
+    /*sp->name = strndup(name, strlen(name)+1);*/
     sp->funcptr = func;
 }
 
+struct sym_node *symlook(char *s, const char *add, double d) {
+    char *p;
+    struct sym_node *sp;
+
+    if(strcmp(add, "true") == 0) {
+        sp = add_to_table(s, d);
+    } else if(strcmp(add, "false") == 0) {
+        if(sp->name != NULL) {
+            return sp;
+        } else {
+            return NULL;
+        }
+    } else {
+        yyerror("no symbol to look up");
+    }
+    return sp;
+}
+
 int main(void) {
-
-    extern double sqrt(), exp(), log();
-
-    addfunc("sqrt", sqrt);
+    g_sym_list = list_create();
+    /*addfunc("sqrt", sqrt);
     addfunc("exp", exp);
-    addfunc("log", log);
+    addfunc("log", log);*/
     yyparse();
 
     return 0;
