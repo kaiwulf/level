@@ -15,6 +15,7 @@ what        { return WHAT; }
 then        { return THEN; }
 let         { return LET; }
 end         { return END; }
+how         { return HOW; }
 \[          { return RSQUARE; }
 \]          { return LSQUARE; }
 :           { return COLON; }

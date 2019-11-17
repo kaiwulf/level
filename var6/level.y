@@ -36,7 +36,7 @@
 %token <str> VARIABLE
 %token <str> FUNC
 %token <dval> NUMBER
-%token PRINT COLON DOUBLECOL ENDCOL END
+%token PRINT COLON DOUBLECOL ENDCOL END HOW
 %token ADDOP SUBOP DIVOP EQOP LET SEMICOL
 %token LET WHAT THEN RSQUARE LSQUARE
 %left '*' DIVOP
@@ -70,7 +70,8 @@ commands:
       commands command
 
 command:
-    WHAT LBLOCK expr RBLOCK COLON commands THEN commands END WHAT SEMICOL
+      WHAT LBLOCK expr RBLOCK COLON commands THEN commands END WHAT SEMICOL
+    | HOW LBLOCK expr RBLOCK COLON commands END HOW SEMICOL
 
 expr:
       expr SUBOP expr { $$ = $1 - $3; }
