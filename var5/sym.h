@@ -84,9 +84,7 @@ struct sym_node *get_sym(char *sym_name) {
         if(ptr->name != NULL) {
             if(strcmp(ptr->name, sym_name) == 0)
                 return ptr;
-        } /*else if(ptr->name == NULL) {
-
-        }*/
+        }
     }
     return NULL;
 }
