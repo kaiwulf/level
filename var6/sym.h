@@ -84,12 +84,17 @@ struct sym_node *get_sym(char *sym_name) {
         if(ptr->name != NULL) {
             if(strcmp(ptr->name, sym_name) == 0)
                 return ptr;
-        } /*else if(ptr->name == NULL) {
-
-        }*/
+        }
     }
     return NULL;
 }
+
+/*
+    print_list()
+    prints the symbol table in the format of a python dictionary.
+    Function adapted from
+    https://stackoverflow.com/questions/20932623/global-pointer-in-linked-list
+*/
 
 void print_list() {
     const struct sym_node *node = g_sym_list->head;
@@ -103,4 +108,33 @@ void print_list() {
     printf("}\n");
 }
 
-// https://stackoverflow.com/questions/20932623/global-pointer-in-linked-list
+void install(char *sym_name, double val) {
+    struct sym_node *s;
+    s = get_sym(sym_name);
+    if(s == NULL) s = put_sym(sym_name, val);
+    else {
+        printf("symbol already exists\n");
+    }
+}
+
+struct sym_node *symlook(char *s, const char *add, double d) {
+    char *p;
+    struct sym_node *sp;
+
+    if(strcmp(add, "true") == 0) {
+        sp = add_to_table(s, d);
+    } else if(strcmp(add, "false") == 0) {
+        if(sp->name != NULL) {
+            return sp;
+        } else {
+            return NULL;
+        }
+    } else {
+        yyerror("no symbol to look up");
+    }
+    return sp;
+}
+
+void context_check(char *sym_name) {
+    if(get_sym(sym_name) == 0) printf("%s is an undeclared identifier\n", sym_name);
+}
