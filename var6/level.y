@@ -37,7 +37,7 @@
 %token <str> FUNC
 %token <dval> NUMBER
 %token PRINT COLON DOUBLECOL ENDCOL END HOW
-%token ADDOP SUBOP DIVOP EQOP LET SEMICOL
+%token ADDOP SUBOP DIVOP EQOP SEMICOL
 %token LET WHAT THEN RSQUARE LSQUARE
 %left '*' DIVOP
 %left ADDOP SUBOP
@@ -56,6 +56,9 @@ statement_list: statement '\n'
     | statement_list statement '\n'
     ;
 
+declarations:
+    LET DOUBLECOL
+
 statement:
       PRINT     { print_list(); }
     | VARIABLE EQOP expr    { install($1, $3); }
@@ -70,8 +73,8 @@ commands:
       commands command
 
 command:
-      WHAT LBLOCK expr RBLOCK COLON commands THEN commands END WHAT SEMICOL
-    | HOW LBLOCK expr RBLOCK COLON commands END HOW SEMICOL
+      WHAT '[' expr ']' COLON commands THEN commands END WHAT SEMICOL
+    | HOW '[' expr ']' COLON commands END HOW SEMICOL
 
 expr:
       expr SUBOP expr { $$ = $1 - $3; }
