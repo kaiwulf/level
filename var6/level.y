@@ -31,50 +31,44 @@
     double dval;
     char *str;
     struct sym_node *sym_node;
+    struct AST ast;
 }
 
 %token <str> VARIABLE
 %token <str> FUNC
 %token <dval> NUMBER
+%token <ast> statement
 %token PRINT COLON DOUBLECOL ENDCOL END HOW
 %token ADDOP SUBOP DIVOP EQOP SEMICOL
 %token LET WHAT THEN RSQUARE LSQUARE
+%token START STOP
 %left '*' DIVOP
 %left ADDOP SUBOP
 %right '^'
 %nonassoc UMINUS
+%precedence THEN
+%precedence END
 
 %type <dval> expr
 
 %%
 
-program:
-        LET DOUBLECOL declarations ENDCOL body SEMICOL
-      | statement_list
 
 statement_list: statement '\n'
     | statement_list statement '\n'
     ;
 
-declarations:
-    LET DOUBLECOL
-
 statement:
       PRINT     { print_list(); }
     | VARIABLE EQOP expr    { install($1, $3); }
     | expr     { printf("%.10g\n", $1); }
-    | body SEMICOL
     ;
 
-body:
-      START COLON commands STOP
-
-commands:
-      commands command
-
 command:
-      WHAT '[' expr ']' COLON commands THEN commands END WHAT SEMICOL
-    | HOW '[' expr ']' COLON commands END HOW SEMICOL
+      WHAT '[' expr ']' COLON statement END WHAT SEMICOL                { if($2) { $4; } }
+    | WHAT '[' expr ']' COLON statement THEN statement END WHAT SEMICOL { if($2) { $4; } else { $6 } }
+    | HOW '[' expr ']' COLON statement END HOW SEMICOL                  {  }
+    ;
 
 expr:
       expr SUBOP expr { $$ = $1 - $3; }

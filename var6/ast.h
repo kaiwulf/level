@@ -1,0 +1,6 @@
+union code {
+    BLOCK_STATEMENT,
+    EXP,
+    WHEN_STATEMENT,
+    HOW_STATEMENT
+}
