@@ -29,13 +29,11 @@
 
 %union {
     double dval;
-    char *str;
-    struct sym_node *sym_node;
-    struct AST ast;
+    ast *val;
 }
 
-%token <str> VARIABLE
-%token <str> FUNC
+%token <val> VARIABLE
+%token <val> FUNC
 %token <dval> NUMBER
 %token <ast> statement
 %token PRINT COLON DOUBLECOL ENDCOL END HOW
@@ -53,15 +51,21 @@
 
 %%
 
+program: /* empty */
+    | START ':' statement_list STOP ';'
+    ;
+
 
 statement_list: statement '\n'
     | statement_list statement '\n'
     ;
 
 statement:
-      PRINT     { print_list(); }
-    | VARIABLE EQOP expr    { install($1, $3); }
-    | expr     { printf("%.10g\n", $1); }
+      
+    ;
+
+commands: command '\n'
+    | commands command '\n'
     ;
 
 command:
@@ -69,6 +73,9 @@ command:
     | WHAT '[' expr ']' COLON statement THEN statement END WHAT SEMICOL { if($2) { $4; } else { $6 } }
     | HOW '[' expr ']' COLON statement END HOW SEMICOL                  {  }
     ;
+
+block:'['  ']'
+
 
 expr:
       expr SUBOP expr { $$ = $1 - $3; }
