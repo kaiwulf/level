@@ -10,28 +10,6 @@ enum code {
     SYM
 };
 
-typedef struct AST {
-    int val;
-    char *str;
-    enum code op;
-    struct symbol_table *sym;
-    struct AST *left, *right;
-} ast;
-
-/* symbol table node to be inserted to hash table */
-typedef struct sym_node {
-    char *name;
-    int val;
-    int addr;
-    ast *func_params;
-    ast *func_body;
-} symbol;
-
-/* symbol table list to be used when collisions occure in hash table */
-struct sym_list {
-    struct sym_list *head;
-}
-
 typedef struct abs_syn_tree {
     enum code op;
     int val;
@@ -40,6 +18,7 @@ typedef struct abs_syn_tree {
     char *str;
 } AST;
 
+/* symbol table node to be inserted to hash table */
 typedef struct sym {
     char *name;
     int val;
@@ -52,6 +31,11 @@ typedef struct sym {
 
 extern symbol sym_table[];
 extern int n_syms;
+
+/* symbol table list to be used when collisions occure in hash table */
+struct sym_list {
+    struct sym_list *head;
+}
 
 void AST_print(AST *p);
 
