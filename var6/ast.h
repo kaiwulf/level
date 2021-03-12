@@ -7,7 +7,9 @@ enum code {
     SUBOP,
     MULTOP,
     DIVOP,
-    SYM
+    SYM,
+    INT,
+    FLOAT
 };
 
 typedef struct abs_syn_tree {
@@ -45,6 +47,7 @@ symbole *get_symbol(AST *p);
 
 AST *make_num(int val);
 AST *make_str(char *s);
+AST *make_float(float f);
 AST *make_AST(enum code op, AST *right, AST *left);
 
 AST *get_nth(AST *p, int nth);
