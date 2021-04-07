@@ -43,7 +43,7 @@ void AST_print(AST *p);
 
 AST *makeSymbol(char *name);
 symbol *lookup_symbol(char *name);
-symbole *get_symbol(AST *p);
+symbol *get_symbol(AST *p);
 
 AST *make_num(int val);
 AST *make_str(char *s);
