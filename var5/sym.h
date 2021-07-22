@@ -68,10 +68,10 @@ struct sym_node *add_to_table(char *s, double v) {
             } else if(sp->next != NULL && sp->next->name == NULL) { /* ...else if next node exists and the string is null... */
                 strncpy(sp->next->name, s, strlen(s)+1);            /* ...copy s to node's string field... */
                 sp->next->value = v;                                /* ...and add value... */
-            } else if(strcmp(sp->name, s) == 0)                     /* else if the string and symbol are the same, return the node.  */
+            } else if(strcmp(sp->name, s) == 0)                     /* ...else if the string and symbol are the same, return the node... */
                 return sp;
-        } else if(sp->name == NULL) {
-            sp->name = strndup(s, strlen(s)+1);
+        } else if(sp->name == NULL) {                               /* ...but if string is NULL... */
+            sp->name = strndup(s, strlen(s)+1);                     /* ...copy it, add it to the list node and return node. */
             sp->value = v;
             return sp;
         }
