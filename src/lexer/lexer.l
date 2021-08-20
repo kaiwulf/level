@@ -1,5 +1,6 @@
 %{
-    #include "level.tab.h"
+    #include "lexer.tab.h"
+    #include "lexer.h"
     extern struct sym_node *symlook(char *s);
     /* extern int yylval; */
 %}
