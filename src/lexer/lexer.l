@@ -2,8 +2,11 @@
     #include "lexer.tab.h"
     #include "lexer.h"
     extern struct sym_node *symlook(char *s);
-    /* extern int yylval; */
+    extern int curr_line_no;
+    extern union yylval;    // is this right?
 %}
+
+\x COMMENT
 
 %%
 ([0-9]+|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?)  { yylval.dval = atof(yytext); return NUMBER; }
@@ -35,14 +38,22 @@ how         { return HOW; }
 ::          { return DOUBLECOL; }
 :\;         { return ENDCOL; }
 
+
+
+"?>"[^\n]*\n    { }
+"@*"            { BEGIN(COMMENT); }
+<COMMENT>"*@"   { BEGIN(INITIAL); }
+<COMMENT>\n     { }
+<COMMENT>.     { }
+
 [ \t]   ;
 [A-Za-z][A-Za-z0-9]*    {
     yylval.str = strndup(yytext, strlen(yytext)+1);
     return VARIABLE;
 }
 
-\n      |
-.       return yytext[0];
+\n      { newline(); }
+.       { return yytext[0]; }
 %%
 int yywrap(void)
 {
