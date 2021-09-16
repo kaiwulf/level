@@ -2,12 +2,12 @@
 #
 # EOF (end-of-file) token is used to indicate that
 # there is no more input left for lexical analysis
-INT, PLUS, MINUS, SPACE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'SPACE', 'EOF'
+INT, PLUS, MINUS, DIV, MULT, MOD, SPACE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'DIV', 'MULT', 'MOD', 'SPACE', 'EOF'
 
 
 class Token(object):
     def __init__(self, type, value):
-        # token type: INTEGER, PLUS, MINUS, or EOF
+        # token type: INTEGER, PLUS, MINUS, SPACE or EOF
         self.type = type
         # token value: 0, 1, 2. 3, 4, 5, 6, 7, 8, 9, '+', '-', ' ', or None
         self.value = value
@@ -40,7 +40,7 @@ class Interpreter(object):
         self.current_token = None
     
     def isop(self, current_char):
-        if current_char == '-' or current_char == '+':
+        if current_char == '-' or current_char == '+' or current_char == '*' or current_char == '/' or current_char == '%':
             return True;
 
     def error(self):
@@ -84,7 +84,19 @@ class Interpreter(object):
                 return token
             elif current_char == '-':
                 token = Token(MINUS, current_char)
-                self.pos +=1
+                self.pos += 1
+                return token
+            elif current_char == '*':
+                token = Token(MULT, current_char)
+                self.pos += 1
+                return token
+            elif current_char == '/':
+                token = Token(DIV, current_char)
+                self.pos += 1
+                return token
+            elif current_char == '%':
+                token = Token(MOD, current_char)
+                self.pos += 1
                 return token
 
         self.error()
@@ -105,7 +117,9 @@ class Interpreter(object):
         print(self.text)
         self.current_token = self.get_next_token()
 
-        
+        if self.current_token.type == SPACE:
+            while self.current_token.type == SPACE:
+                self.eat(SPACE)
 
         if self.current_token.type == INT:
                 left = self.current_token
@@ -113,7 +127,9 @@ class Interpreter(object):
                 self.eat(INT)
 
         while self.current_token.type != EOF:
-            if self.current_token.type == PLUS:
+            if self.current_token.type == SPACE:
+                self.eat(SPACE)
+            elif self.current_token.type == PLUS:
                 op = '+'
                 self.eat(PLUS)
                 continue
@@ -121,15 +137,38 @@ class Interpreter(object):
                 op = '-'
                 self.eat(MINUS)
                 continue
+            elif self.current_token.type == DIV:
+                op = '/'
+                self.eat(DIV)
+                continue
+            elif self.current_token.type == MULT:
+                op = '*'
+                self.eat(MULT)
+                continue
+            elif self.current_token.type == MOD:
+                op = '%'
+                self.eat(MOD)
+                continue
             if self.current_token.type == INT:
                 right = self.current_token
                 self.eat(INT)
                 continue
 
+        if self.current_token.type == SPACE:
+            while self.current_token.type == SPACE:
+                self.eat(SPACE)
+
         if op == '+':
             result = left.value + right.value
         if op == '-':
             result = left.value - right.value
+        if op == '/':
+            result = left.value / right.value
+        if op == '*':
+            result = left.value * right.value
+        if op == '%':
+            result = left.value % right.value
+
         return result
 
 
