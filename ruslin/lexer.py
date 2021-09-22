@@ -2,7 +2,7 @@
 #
 # EOF (end-of-file) token is used to indicate that
 # there is no more input left for lexical analysis
-INT, PLUS, MINUS, DIV, MULT, MOD, SPACE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'DIV', 'MULT', 'MOD', 'SPACE', 'EOF'
+INT, PLUS, MINUS, DIV, MULT, MOD, EXP, SPACE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'DIV', 'MULT', 'MOD', 'EXP', 'SPACE', 'EOF'
 
 
 class Token(object):
@@ -56,10 +56,10 @@ class Interpreter(object):
     
     def is_int(self):
         result = ''
-        while self.current_char.isdigit() and self.current_char is not None:
+        while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance()
-            return int(result)
+        return int(result)
 
     def get_next_token(self):
         """Lexical analyzer (also known as scanner or tokenizer)
@@ -72,10 +72,10 @@ class Interpreter(object):
         
             if self.current_char.isspace():
                     self.whitespace()
+                    continue
 
             if self.current_char.isdigit():
-                token = Token(INT, self.is_int())
-                return token
+                return Token(INT, self.is_int())
 
             if self.current_char == '+':
                 self.advance()
@@ -97,6 +97,10 @@ class Interpreter(object):
                 self.advance()
                 return Token(MOD, '%')
 
+            if self.current_char == '^':
+                self.advance()
+                return Token(EXP, '^')
+
             self.error()
         
         return Token(EOF, None)
@@ -112,7 +116,6 @@ class Interpreter(object):
             self.error()
 
     def expr(self):
-        """expr -> INTEGER PLUS INTEGER"""
         # set current token to the first token taken from the input
         print(self.text)
         self.current_token = self.get_next_token()
@@ -123,8 +126,9 @@ class Interpreter(object):
 
         if self.current_token.type == INT:
                 left = self.current_token
-                print("left: ", left)
                 self.eat(INT)
+
+        print(self.current_token.type)
 
         while self.current_token.type != EOF:
             if self.current_token.type == SPACE:
@@ -149,6 +153,10 @@ class Interpreter(object):
                 op = '%'
                 self.eat(MOD)
                 continue
+            elif self.current_token.type == EXP:
+                op = '^'
+                self.eat(EXP)
+                continue
             if self.current_token.type == INT:
                 right = self.current_token
                 self.eat(INT)
@@ -168,6 +176,8 @@ class Interpreter(object):
             result = left.value * right.value
         if op == '%':
             result = left.value % right.value
+        if op == '^':
+            result = left.value ** right.value
 
         return result
 
