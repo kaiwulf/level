@@ -42,6 +42,11 @@ class Interpreter(object):
 
     def error(self):
         raise Exception('Error parsing input')
+
+    def term(self):
+        token = self.current_token
+        self.eat(INT)
+        return token.value
     
     def advance(self):
         self.pos += 1
@@ -116,68 +121,28 @@ class Interpreter(object):
             self.error()
 
     def expr(self):
-        # set current token to the first token taken from the input
-        print(self.text)
         self.current_token = self.get_next_token()
 
-        if self.current_token.type == SPACE:
-            while self.current_token.type == SPACE:
-                self.eat(SPACE)
-
-        if self.current_token.type == INT:
-                left = self.current_token
-                self.eat(INT)
-
-        print(self.current_token.type)
-
+        result = self.term()
         while self.current_token.type != EOF:
-            if self.current_token.type == SPACE:
-                self.eat(SPACE)
-            elif self.current_token.type == PLUS:
-                op = '+'
+            if self.current_token.type == PLUS:
                 self.eat(PLUS)
-                continue
+                result += self.term()
             elif self.current_token.type == MINUS:
-                op = '-'
                 self.eat(MINUS)
-                continue
+                result -= self.term()
             elif self.current_token.type == DIV:
-                op = '/'
                 self.eat(DIV)
-                continue
+                result /= self.term()
             elif self.current_token.type == MULT:
-                op = '*'
                 self.eat(MULT)
-                continue
+                result *= self.term()
             elif self.current_token.type == MOD:
-                op = '%'
                 self.eat(MOD)
-                continue
+                result %= self.term()
             elif self.current_token.type == EXP:
-                op = '^'
                 self.eat(EXP)
-                continue
-            if self.current_token.type == INT:
-                right = self.current_token
-                self.eat(INT)
-                continue
-
-        if self.current_token.type == SPACE:
-            while self.current_token.type == SPACE:
-                self.eat(SPACE)
-
-        if op == '+':
-            result = left.value + right.value
-        if op == '-':
-            result = left.value - right.value
-        if op == '/':
-            result = left.value / right.value
-        if op == '*':
-            result = left.value * right.value
-        if op == '%':
-            result = left.value % right.value
-        if op == '^':
-            result = left.value ** right.value
+                result **= self.term()
 
         return result
 
