@@ -2,7 +2,7 @@
 #
 # EOF (end-of-file) token is used to indicate that
 # there is no more input left for lexical analysis
-INT, PLUS, MINUS, DIV, MULT, MOD, EXP, SPACE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'DIV', 'MULT', 'MOD', 'EXP', 'SPACE', 'EOF'
+INT, PLUS, MINUS, DIV, MULT, MOD, EXP, SPACE, LPAREN, RPAREN, EOF = 'INTEGER', 'PLUS', 'MINUS', 'DIV', 'MULT', 'MOD', 'EXP', 'SPACE', 'LPAREN', 'RPAREN', 'EOF'
 
 
 class Token(object):
@@ -58,6 +58,9 @@ class Interpreter(object):
     def whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
+
+    def is_paren(self):
+        pass
     
     def is_int(self):
         result = ''

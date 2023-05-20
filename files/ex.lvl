@@ -1,13 +1,13 @@
 @***********************************ex.lvl*******************************************
 
 operators:
- $,   &,  =,   *,    %,   /, \,   ++, --,   ^,     ~,      ==,       #,       !,   ?,  |,  +
+ $,   &,  =,   *,    %,   /, \,   ++, --,   ^,     ~,      ==,       #,       !,   ?,   |,   +,     ^*
 
-div, and, or, mult, mod, gt, lt, add, sub, expo, pointer, equal, logical eq, xor, not, inc, dec
+div, and, or, mult, mod, gt, lt, add, sub, expo, pointer, equal, logical eq, xor, not, inc, dec, assignment
 
 braces:
 
-(, ), [, ], {, }, ::, :;, <, >
+(, ), [, ], {, }, ::, :;, <, >, |,>
 
 braces for compound statements:
     (, )
@@ -21,17 +21,28 @@ keywords:
 	loop   (while loop)
 	how   (for loop)
 	go ... loop (do ... while)
-	what ... then (if ... else)
+	what ... then ... that (if ... else ... third conditional)
+	it ... go ... go ... fine (switch ... case ... case ... default)
 	segment   (a function)
 	start
 	end
 	begin
 	stop
 	void
+	howdy	(creating an alias name for variable)
 
-characters:
-	0-9, a-z,A-Z,`,-,_
-
+variables:
+	0-9, a-z,A-Z,`,-,_		?> variables can be of the form [a-z][A-Z][0-9][`][-][_]
+	|this is a variable>	?> any characters within the |> brackets are treated as a variable. Including spaces.
+	| this is a variable>   ?> this second one is a different variable due to the space.
+	|\|this is a var\>>		?> can use escaped brackets in variable name.
+	code(|let::				?> variable names in brackets can be extracted and interpreted if it contains level code
+		un num: var
+		dec: ret
+	      :;
+	      var = 12
+	      func_12<12> *^ ret>) *^ var12		?> The result of the code that makes a variable name executed as a small program is assigned to var12
+	|this is a long variable name> howdy new-var	?> 'howdy' creates an alias for long variable names. using new-var has the same effect as using the longer version.
 block comment:
     @* and *@
 single line comment:
@@ -42,6 +53,9 @@ types:
     signed float: dec
     character: letter
     unsigned: un
+
+control flow:
+	can only use its with 3 or more options. For 3 or less conditionals, must use what/then/that.
 
 General program structure:
 
