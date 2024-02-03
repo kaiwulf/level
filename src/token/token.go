@@ -7,7 +7,7 @@ type Token struct {
 	Literal string
 }
 
-const {
+const (
 	ERR			= "ERR"
 	EOF			= "EOF"
 
@@ -33,4 +33,4 @@ const {
 
 	FUNCTION	= "segment"
 	LET			= "let"
-}
+)

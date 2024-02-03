@@ -1,8 +1,7 @@
-package lexer
+package main
 
 import (
-	"testing"
-
+	"level/lexer"
 	"level/token"
 )
 
@@ -19,7 +18,7 @@ func TestNextToken(t *testing.T) {
 		{ token.RPAREN, "}" },
 		{ token.LSQUARE, "[" },
 		{ token.RSQUARE, "]" },
-		{ token.ENDCOL, ":;" }
+		{ token.ENDCOL, ":;" },
 		{ token.DOUBLECOL, "::" },
 		{ token.COMMA, "," },
 		{ token.SEMICOLON, ";" },
@@ -27,7 +26,7 @@ func TestNextToken(t *testing.T) {
 		{ token.RPAREN, ")" },
 		{ token.EOF, "" },
 	}
-	l := New(input)
+	l := lexer.New(input)
 
 	for i, tt := range tests {
 		tok := l.NextToken()
