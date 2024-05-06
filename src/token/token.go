@@ -30,6 +30,8 @@ const (
 	RBRACE		= "}"
 	LPAREN		= "("
 	RPAREN		= ")"
+	LTBRACE		= '<'
+	GTBRACE		= '>'
 
 	FUNCTION	= "segment"
 	LET			= "let"
