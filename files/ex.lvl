@@ -40,9 +40,16 @@ variables:
 		un num: var
 		dec: ret
 	      :;
-	      var = 12
+	      var *^ 12
 	      func_12<12> *^ ret>) *^ var12		?> The result of the code that makes a variable name executed as a small program is assigned to var12
 	|this is a long variable name> howdy new-var	?> 'howdy' creates an alias for long variable names. using new-var has the same effect as using the longer version.
+
+	Assignments go from right to left.
+
+defining & calling functions:
+functions are defined by: segment {return-val} <= begin<T> ()
+functions are called and assign a return value with: begin<T> *^ ret-val
+all functions must have a let:: ... :; block for declaring variables
 block comment:
     @* and *@
 single line comment:
@@ -72,9 +79,9 @@ start:
 
 	segment {void} <= begin<void> (
 
-		m = 0;
-		int = 0;
-		n = 0;
+		0 *^ m;
+		0 *^ ing;
+		0 *^ n;
 
 		how [ m \ 100 ! m == m ++ 1 ] :
 
